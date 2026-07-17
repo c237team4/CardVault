@@ -166,14 +166,17 @@ Write commit messages that say what you did. `"Add login validation"` is useful.
 
 ## Who owns what
 
-Open `app.js` and scroll to the `ROUTES` section. It's split into six labelled blocks — **one per person**:
+Open `app.js` and scroll to the `ROUTES` section. It's split into six labelled blocks — **one per person**, already assigned:
 
 ```
-// STUDENT A  |  Owner: TODO
-// User Registration, Login and Access Control
+// STUDENT B  |  Owner: Ryan
+// Adding New Information -- add a card to your collection
+// Routes: GET /add-card, POST /add-card
 ```
 
-**Put your name where it says `Owner: TODO`.** Then only add code inside your own block.
+**Find your name, and only add code inside your own block.** Your name sitting above the code you wrote, plus your commits touching those lines, is what shows the lecturer which part was yours.
+
+Your view files have the same header, with notes on what the route passes you and what the form needs. Read them before you start — they will save you an hour.
 
 | Block | Owner | Responsibility | Views you own |
 | --- | --- | --- | --- |
