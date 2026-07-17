@@ -10,7 +10,7 @@ Node.js + Express + EJS + MySQL.
 
 ### Step 1: Tell Git who you are
 
-This is important. It stamps your name on every commit you make, which is **how the lecturer sees what you personally contributed**. Get it wrong and your work looks like someone else's.
+This is important. It stamps your name on every commit you make. 
 
 In a terminal, run these two lines, with your own name and your school email:
 
