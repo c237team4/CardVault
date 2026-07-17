@@ -200,6 +200,15 @@ app.post('/login', (req, res) => {
         }
 
         if (results.length > 0) {
+            // An admin can disable an account (is_active = 0) instead of
+            // deleting it, since deleting would cascade and destroy that
+            // person's whole collection. The credentials are correct here,
+            // so we can safely say why they are being turned away.
+            if (results[0].is_active === 0) {
+                req.flash('error', 'Your account has been deactivated. Please contact an admin.');
+                return res.redirect('/login');
+            }
+
             // Store the user on the session. Every later request carries a
             // session cookie, which is how checkAuthenticated knows who this
             // is without asking them to log in again on every page.
