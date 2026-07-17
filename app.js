@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
         cb(null, 'public/images'); // Directory to save uploaded files
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname); 
+        cb(null, file.originalname);
     }
 });
 
@@ -44,13 +44,13 @@ app.use(express.urlencoded({
     extended: false
 }));
 
-//TO DO: Insert code for Session Middleware below 
+//TO DO: Insert code for Session Middleware below
 app.use(session({
     secret: 'secret',
     resave: false,
     saveUninitialized: true,
     // Session expires after 1 week of inactivity
-    cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 } 
+    cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
 }));
 
 app.use(flash());
@@ -82,7 +82,7 @@ const validateRegistration = (req, res, next) => {
     if (!username || !email || !password || !address || !contact || !role) {
         return res.status(400).send('All fields are required.');
     }
-    
+
     if (password.length < 6) {
         req.flash('error', 'Password should be at least 6 or more characters long');
         req.flash('formData', req.body);
@@ -91,37 +91,87 @@ const validateRegistration = (req, res, next) => {
     next();
 };
 
-
-
+// =============================================================================
+// ROUTES
 //
+// Each member owns ONE section below. Add your routes inside your own block
+// so we are not all editing the same lines -- that is what causes merge
+// conflicts. Do not reformat someone else's section.
+//
+// Put your name on your block at the first team meeting.
+// =============================================================================
+
+
+// -----------------------------------------------------------------------------
+// SHARED  |  Owner: whole team
+// Landing page and logout. Agreed together, changed together.
+// -----------------------------------------------------------------------------
+
+app.get('/', (req, res) => {
+    res.render('index', { user: req.session.user });
+});
+
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
+});
+
+
+// -----------------------------------------------------------------------------
+// STUDENT A  |  Owner: TODO
+// User Registration, Login and Access Control
+// Routes: GET /register, POST /register, GET /login, POST /login
+// -----------------------------------------------------------------------------
 
 
 
 
+// -----------------------------------------------------------------------------
+// STUDENT B  |  Owner: TODO
+// Adding New Information -- add a card to your collection
+// Routes: GET /add-card, POST /add-card   (POST uses upload.single('image'))
+// -----------------------------------------------------------------------------
 
 
 
 
+// -----------------------------------------------------------------------------
+// STUDENT C  |  Owner: TODO
+// Viewing and Displaying Information
+// Routes: GET /dashboard, GET /view-collection, GET /card/:id
+// -----------------------------------------------------------------------------
 
 
 
 
+// -----------------------------------------------------------------------------
+// STUDENT D  |  Owner: TODO
+// Editing Existing Information
+// Routes: GET /edit-card/:id, POST /edit-card/:id
+// -----------------------------------------------------------------------------
 
 
 
 
+// -----------------------------------------------------------------------------
+// STUDENT E  |  Owner: TODO
+// Removing Information + admin moderation
+// Routes: POST /delete-card/:id, GET /admin-dashboard
+// -----------------------------------------------------------------------------
 
 
 
 
+// -----------------------------------------------------------------------------
+// STUDENT F  |  Owner: TODO
+// Searching, Filtering and Organising -- the public trade board
+// Routes: GET /marketplace   (search by name/set, filter by condition, sort)
+// -----------------------------------------------------------------------------
 
 
 
 
-
-
-
-
+// =============================================================================
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
