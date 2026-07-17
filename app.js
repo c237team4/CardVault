@@ -276,18 +276,31 @@ app.post('/login', (req, res) => {
 // A collector with 300 cards needs to find one. This is what makes "know what
 // you own" usable rather than just a long list.
 //
-// Routes: GET /view-collection  (search by card_name, filter by category and
-//         condition, sort by value / name / condition / date added)
+// Routes: GET /view-collection  (search by card_name, filter by genre /
+//         category / condition, sort by value / name / condition / date added)
 //
 // Work with Student C -- C renders the collection, F makes it searchable, so
 // the two of you share /view-collection. Agree who owns the route.
 //
-// Filter on category_id and condition_id only. Those are ids pointing at the
-// admin-curated lists, so the values are controlled and the filter is exact.
+// Three filters, and they are NOT the same kind:
 //
-// DO NOT filter on cards.rarity -- it is free text. 'Holo Rare' / 'holo rare' /
-// 'Holo' are three different strings, so a rarity filter would silently miss
-// cards. Rarity is display only.
+//   genre_id      exact match:  AND c.genre_id = ?
+//   condition_id  exact match:  AND c.condition_id = ?
+//                 Both are ids from the admin-curated lists, so exact is right.
+//
+//   category      free text, so LIKE:  AND c.category LIKE ?   with '%term%'
+//                 The collation is utf8mb4_general_ci -- case and accent
+//                 insensitive -- so 'Pokemon'/'pokemon'/'POKEMON'/'Pokémon'
+//                 all match '%pokemon%'. Verified. It will NOT match
+//                 abbreviations ('PKMN') or typos. That is accepted.
+//
+//                 Tip: to build the category dropdown, read back what this user
+//                 has actually typed:
+//                     SELECT DISTINCT category FROM cards WHERE user_id = ?
+//                 -- their own vocabulary, so it is self-consistent.
+//
+// DO NOT filter on cards.rarity -- free text with no shared vocabulary across
+// genres ('Holo Rare' vs 'Rookie'). Rarity is display only.
 //
 // Sort by condition using conditions.condition_rank (1 = best) -- sorting on
 // condition_name would put Excellent before Mint, alphabetically.

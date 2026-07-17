@@ -12,54 +12,49 @@
 -- -----------------------------------------------------------------------------
 -- Clean up
 --
--- Dropped in reverse dependency order: cards points at users and at the
--- reference tables, so cards has to go first or the foreign keys block it.
+-- Dropped in reverse dependency order: cards points at users, genres and
+-- conditions, so cards has to go first or the foreign keys block it.
 --
 -- 'products' is left over from the SupermarketApp class exercise.
--- 'rarities' was an earlier design -- see the note on cards.rarity below.
+-- 'categories' and 'rarities' were earlier designs -- both are now free text
+-- on the cards table. See the notes there.
 -- -----------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS cards;
 DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS rarities;
 DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS genres;
 DROP TABLE IF EXISTS conditions;
 
 
 -- =============================================================================
 -- REFERENCE TABLES  --  maintained by the admin
 --
--- Why these exist:
---   If category/condition were free text, users would type 'Pokemon',
---   'pokemon', 'Pokémon' and 'PKMN' -- and then "show me all my Pokemon cards"
---   would miss most of them. Filtering is only reliable when the values are
---   controlled.
---
---   So the admin curates these lists and users pick from a dropdown. The
---   admin's job is what makes the user's search and filter work.
---
--- Why only these two:
---   A field gets a reference table when it is (a) filtered on, and
---   (b) drawn from a fixed shared vocabulary. Category and condition are both.
---   Rarity is not -- see cards.rarity below.
+-- A field gets a reference table when it is (a) filtered on, and (b) drawn
+-- from a fixed shared vocabulary that everybody agrees on. genre and condition
+-- are both. category and rarity are not -- see the cards table.
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
--- categories  --  what franchise or sport a card belongs to
+-- genres  --  the broad kind of card
+--
+-- A small, stable vocabulary that applies to every collector. 'Others' is the
+-- catch-all so nobody is ever blocked from adding a card.
 -- -----------------------------------------------------------------------------
-CREATE TABLE categories (
-    category_id     INT AUTO_INCREMENT PRIMARY KEY,
-    category_name   VARCHAR(50) NOT NULL UNIQUE
+CREATE TABLE genres (
+    genre_id        INT AUTO_INCREMENT PRIMARY KEY,
+    genre_name      VARCHAR(50) NOT NULL UNIQUE
 );
 
 -- -----------------------------------------------------------------------------
 -- conditions  --  the physical state of the card
 --
--- Condition is universal across every category. A card's surface, edges,
--- corners and centering exist whether it is a Pokemon card or a basketball
--- card, which is why the professional graders (PSA, BGS, CGC) use the same
--- 1-10 scale for all of them. So one shared list is correct here.
+-- Condition is universal across every genre. A card's surface, edges, corners
+-- and centering exist whether it is a Pokemon card or a basketball card, which
+-- is why the professional graders (PSA, BGS, CGC) use the same 1-10 scale for
+-- all of them. So one shared list is correct here.
 --
 -- condition_rank is the important column. Condition is an ORDER, not just a
 -- label: Mint is better than Near Mint is better than Excellent. Sorting on
@@ -126,28 +121,36 @@ CREATE TABLE users (
 --     what lets the dashboard answer "what did I pay, and what is it worth
 --     now" -- with only one of them, that question is unanswerable.
 --
---   category_id / condition_id
---     Foreign keys to the admin-curated lists rather than free text, so
---     filtering and sorting actually work.
+--   genre_id / condition_id
+--     Foreign keys to the admin-curated lists. Controlled values, so filtering
+--     and sorting on them are exact.
 --
---   rarity is FREE TEXT, on purpose
---     Rarity has no shared vocabulary across categories. Pokemon uses
---     'Holo Rare' and 'Secret Rare'; basketball and football cards use
---     'Rookie', 'Autograph', 'Patch', 'Numbered'. One list would be wrong for
---     half the collection, and a list per category would need cascading
---     dropdowns we do not have time to build.
+--   category is FREE TEXT, on purpose
+--     'Pokemon', 'NBA', 'One Piece'. A fixed list would block a collector whose
+--     franchise is not listed, and new franchises appear constantly. Free text
+--     means nobody is ever blocked.
 --
---     Consequence, and it is a real one: rarity is DISPLAY ONLY. Do not filter
---     on it. 'Holo Rare' / 'holo rare' / 'Holo' are three different strings, so
---     a rarity filter would silently miss cards. Filtering is done on category
---     and condition, which are controlled.
+--     It is still filterable, because the database collation is
+--     utf8mb4_general_ci -- case AND accent insensitive. Verified:
+--         'Pokemon'  LIKE '%pokemon%'  -> matches
+--         'POKEMON'  LIKE '%pokemon%'  -> matches
+--         'Pokémon'  LIKE '%pokemon%'  -> matches
+--         'Japanese Pokemon' LIKE '%pokemon%' -> matches
+--     What it does NOT match: abbreviations ('PKMN'), typos ('Pokmon') and
+--     synonyms ('Soccer' vs 'Football'). Accepted -- a collector is mostly
+--     consistent with their own vocabulary inside their own collection.
+--
+--   rarity is FREE TEXT, display only
+--     No shared vocabulary across genres: Pokemon says 'Holo Rare';
+--     basketball says 'Rookie'/'Autograph'/'Patch'. Unlike category, rarity is
+--     not filtered on at all -- it is shown on the card and nothing more.
 --
 --   ON DELETE CASCADE on user_id
 --     Delete a user and their cards go too. Without this, deleting a user
 --     would leave orphan cards pointing at a user_id that no longer exists.
 --
 --   ON DELETE RESTRICT on the reference tables (this is the default)
---     MySQL refuses to delete a category that cards still use. The admin must
+--     MySQL refuses to delete a genre that cards still use. The admin must
 --     reassign or remove those cards first -- the database will not let the
 --     admin silently break existing records.
 --
@@ -159,7 +162,8 @@ CREATE TABLE cards (
     card_id         INT AUTO_INCREMENT PRIMARY KEY,
     user_id         INT NOT NULL,
     card_name       VARCHAR(100) NOT NULL,
-    category_id     INT NOT NULL,
+    genre_id        INT NOT NULL,
+    category        VARCHAR(50) NOT NULL,                  -- free text, filtered with LIKE
     condition_id    INT NOT NULL,
     rarity          VARCHAR(50) DEFAULT NULL,              -- free text, display only
     purchase_price  DECIMAL(10,2) NOT NULL DEFAULT 0.00,   -- what they paid
@@ -170,7 +174,7 @@ CREATE TABLE cards (
     date_added      DATE NOT NULL DEFAULT (CURRENT_DATE),
 
     FOREIGN KEY (user_id)      REFERENCES users (user_id)          ON DELETE CASCADE,
-    FOREIGN KEY (category_id)  REFERENCES categories (category_id),
+    FOREIGN KEY (genre_id)     REFERENCES genres (genre_id),
     FOREIGN KEY (condition_id) REFERENCES conditions (condition_id)
 );
 
@@ -187,17 +191,10 @@ CREATE TABLE cards (
 INSERT INTO users (username, email, password, role) VALUES
     ('admin', 'admin@cardvault.sg', SHA1('admin123'), 'admin');
 
--- Starting reference lists. The admin can add to these in the app -- they are
--- seeded only so the app is usable on first run. If a collector has a card
--- type that is not listed, the admin adds it: that is the admin's job.
-INSERT INTO categories (category_name) VALUES
-    ('Pokemon'),
-    ('One Piece'),
-    ('Yu-Gi-Oh'),
-    ('Magic: The Gathering'),
-    ('NBA'),
-    ('Football'),
-    ('Formula 1');
+INSERT INTO genres (genre_name) VALUES
+    ('Trading Card Games'),
+    ('Sport Cards'),
+    ('Others');
 
 -- Ranked best to worst. Lower rank = better condition.
 INSERT INTO conditions (condition_name, condition_rank) VALUES
