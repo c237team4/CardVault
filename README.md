@@ -10,7 +10,7 @@ Node.js + Express + EJS + MySQL.
 
 ### Step 1: Tell Git who you are
 
-This is important. It stamps your name on every commit you make. 
+This is important. It stamps your name on every commit you make.
 
 In a terminal, run these two lines, with your own name and your school email:
 
@@ -79,47 +79,34 @@ If you got both lines and the page loads — setup is done.
 
 ## The database — read this before you touch it
 
-**You do not need to install MySQL.** The database already exists on Azure, and the login details are in `app.js`. If you saw `Connected to MySQL database`, you are already on it.
+**MySQL **database has already setup on Azure, and the login details are in `app.js`. If you saw `Connected to MySQL database`, you are already on it.
 
 **We all share ONE database.** There is no copy on your laptop. When you add a card, everyone sees it. When you break something, everyone gets it.
 
-### 🚨 Do NOT run `database/cardvault.sql`
-
-That file starts with `DROP TABLE` — it deletes every table and rebuilds them empty. Running it wipes **everyone's** data, including whatever your teammates were testing with.
-
-The database is already set up. You never need to run it.
-
-If it genuinely has to be re-run (a schema change we all agreed on), **say so in the group chat first** so nobody loses work mid-task.
-
 ### The tables
 
-| Table | What's in it | Owner |
-|---|---|---|
-| `users` | accounts, roles | Student A |
-| `cards` | everyone's collections | B / C / D / E / F |
-| `genres` | Trading Card Games, Sport Cards, Others | admin-curated |
-| `conditions` | Mint → Poor, with `condition_rank` (1 = best) | admin-curated |
+| Table          | What's in it                                     | Owner             |
+| -------------- | ------------------------------------------------ | ----------------- |
+| `users`      | accounts, roles                                  | A                 |
+| `cards`      | user collection                                  | B / C / D / E / F |
+| `genres`     | Trading Card Games, Sport Cards, Others          | admin-curated     |
+| `conditions` | Mint → Poor, with `condition_rank` (1 = best) | admin-curated     |
 
-`database/cardvault.sql` is our schema — **read it**. Every column has a comment explaining why it is the way it is, and you will be asked to justify your own feature's columns.
+You can refer to the screenshots posted in MS Team or login via MySQL Workbench
 
 ### Test logins
 
 Already in the database, ready to use:
 
-| Email | Password | What they have |
-|---|---|---|
-| `ryan@demo.sg` | `demo123` | Pokemon collector, 12 cards, ~S$28k |
-| `mei@demo.sg` | `demo123` | Sports collector, 12 cards, ~S$5.6k |
-| `jun@demo.sg` | `demo123` | Casual, 16 cards, ~S$420 |
-| `admin@cardvault.sg` | `admin123` | Admin, **no cards** (use this to test empty states) |
+| Email                  | Password     | What they have                                           |
+| ---------------------- | ------------ | -------------------------------------------------------- |
+| `ryan@demo.sg`       | `demo123`  | Pokemon collector, 12 cards, ~S$28k                      |
+| `mei@demo.sg`        | `demo123`  | Sports collector, 12 cards, ~S$5.6k                      |
+| `jun@demo.sg`        | `demo123`  | Casual, 16 cards, ~S$420                                 |
+| `admin@cardvault.sg` | `admin123` | Admin,**no cards** (use this to test empty states) |
 
 You can also register your own account at `/register`.
 
-### Two traps in the demo data
-
-**Ryan's categories are spelled three different ways on purpose** — `Pokemon`, `pokemon`, `Pokémon`. That is not a typo. It proves the `LIKE` filter still finds all of them, because our database collation ignores case and accents. **Do not "fix" them.**
-
-**`quantity` can be more than 1.** Ryan has 8 rows but 12 actual cards. Any total that forgets `* quantity` will be wrong and still look fine. Watch for this in dashboards and totals.
 
 ---
 
@@ -178,14 +165,14 @@ Open `app.js` and scroll to the `ROUTES` section. It's split into six labelled b
 
 Your view files have the same header, with notes on what the route passes you and what the form needs. Read them before you start — they will save you an hour.
 
-| Block | Owner | Responsibility | Views you own |
-| --- | --- | --- | --- |
-| **A** | Boon Meng | Registration, Login, Access Control | `login.ejs`, `register.ejs` |
-| **B** | Ryan | Adding a card | `add-card.ejs` |
-| **C** | Sammi | Dashboard + viewing cards | `dashboard.ejs`, `view-collection.ejs` |
-| **D** | Ezann | Editing a card | `edit-card.ejs` |
-| **E** | Rainie | Deleting cards + admin (users, genres, conditions) | `admin-dashboard.ejs` |
-| **F** | Zhan Fung | Search / filter / sort your own collection | `view-collection.ejs` (shared with C) |
+| Block       | Owner     | Responsibility                                     | Views you own                              |
+| ----------- | --------- | -------------------------------------------------- | ------------------------------------------ |
+| **A** | Boon Meng | Registration, Login, Access Control                | `login.ejs`, `register.ejs`            |
+| **B** | Ryan      | Adding a card                                      | `add-card.ejs`                           |
+| **C** | Sammi     | Dashboard + viewing cards                          | `dashboard.ejs`, `view-collection.ejs` |
+| **D** | Ezann     | Editing a card                                     | `edit-card.ejs`                          |
+| **E** | Rainie    | Deleting cards + admin (users, genres, conditions) | `admin-dashboard.ejs`                    |
+| **F** | Zhan Fung | Search / filter / sort your own collection         | `view-collection.ejs` (shared with C)    |
 
 **Why this matters:** Git merges cleanly when people change *different lines*. It gets confused when two people change the *same* lines. Staying inside your own block means you can all work at the same time without fighting.
 
