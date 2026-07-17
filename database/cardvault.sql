@@ -12,17 +12,18 @@
 -- -----------------------------------------------------------------------------
 -- Clean up
 --
--- Dropped in reverse dependency order: cards points at users and at the three
+-- Dropped in reverse dependency order: cards points at users and at the
 -- reference tables, so cards has to go first or the foreign keys block it.
 --
 -- 'products' is left over from the SupermarketApp class exercise.
+-- 'rarities' was an earlier design -- see the note on cards.rarity below.
 -- -----------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS cards;
 DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS rarities;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS categories;
-DROP TABLE IF EXISTS rarities;
 DROP TABLE IF EXISTS conditions;
 
 
@@ -30,17 +31,22 @@ DROP TABLE IF EXISTS conditions;
 -- REFERENCE TABLES  --  maintained by the admin
 --
 -- Why these exist:
---   If category/rarity/condition were free text, users would type 'Pokemon',
+--   If category/condition were free text, users would type 'Pokemon',
 --   'pokemon', 'Pokémon' and 'PKMN' -- and then "show me all my Pokemon cards"
 --   would miss most of them. Filtering is only reliable when the values are
 --   controlled.
 --
---   So the admin curates these lists, and users pick from a dropdown. The
+--   So the admin curates these lists and users pick from a dropdown. The
 --   admin's job is what makes the user's search and filter work.
+--
+-- Why only these two:
+--   A field gets a reference table when it is (a) filtered on, and
+--   (b) drawn from a fixed shared vocabulary. Category and condition are both.
+--   Rarity is not -- see cards.rarity below.
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
--- categories  --  what franchise/sport a card belongs to
+-- categories  --  what franchise or sport a card belongs to
 -- -----------------------------------------------------------------------------
 CREATE TABLE categories (
     category_id     INT AUTO_INCREMENT PRIMARY KEY,
@@ -48,24 +54,17 @@ CREATE TABLE categories (
 );
 
 -- -----------------------------------------------------------------------------
--- rarities  --  how rare the card is
--- -----------------------------------------------------------------------------
-CREATE TABLE rarities (
-    rarity_id       INT AUTO_INCREMENT PRIMARY KEY,
-    rarity_name     VARCHAR(50) NOT NULL UNIQUE
-);
-
--- -----------------------------------------------------------------------------
 -- conditions  --  the physical state of the card
+--
+-- Condition is universal across every category. A card's surface, edges,
+-- corners and centering exist whether it is a Pokemon card or a basketball
+-- card, which is why the professional graders (PSA, BGS, CGC) use the same
+-- 1-10 scale for all of them. So one shared list is correct here.
 --
 -- condition_rank is the important column. Condition is an ORDER, not just a
 -- label: Mint is better than Near Mint is better than Excellent. Sorting on
 -- condition_name would give alphabetical nonsense (Excellent before Mint).
---
--- With a rank, "show me everything Near Mint or better" becomes
---     WHERE condition_rank <= 2
--- which is the shortlist of cards worth paying to have professionally graded.
--- That is CardVault's pre-grading filter.
+-- Sort with:  ORDER BY condition_rank ASC
 -- -----------------------------------------------------------------------------
 CREATE TABLE conditions (
     condition_id    INT AUTO_INCREMENT PRIMARY KEY,
@@ -127,9 +126,21 @@ CREATE TABLE users (
 --     what lets the dashboard answer "what did I pay, and what is it worth
 --     now" -- with only one of them, that question is unanswerable.
 --
---   category_id / rarity_id / condition_id
+--   category_id / condition_id
 --     Foreign keys to the admin-curated lists rather than free text, so
---     filtering and grouping actually work.
+--     filtering and sorting actually work.
+--
+--   rarity is FREE TEXT, on purpose
+--     Rarity has no shared vocabulary across categories. Pokemon uses
+--     'Holo Rare' and 'Secret Rare'; basketball and football cards use
+--     'Rookie', 'Autograph', 'Patch', 'Numbered'. One list would be wrong for
+--     half the collection, and a list per category would need cascading
+--     dropdowns we do not have time to build.
+--
+--     Consequence, and it is a real one: rarity is DISPLAY ONLY. Do not filter
+--     on it. 'Holo Rare' / 'holo rare' / 'Holo' are three different strings, so
+--     a rarity filter would silently miss cards. Filtering is done on category
+--     and condition, which are controlled.
 --
 --   ON DELETE CASCADE on user_id
 --     Delete a user and their cards go too. Without this, deleting a user
@@ -149,8 +160,8 @@ CREATE TABLE cards (
     user_id         INT NOT NULL,
     card_name       VARCHAR(100) NOT NULL,
     category_id     INT NOT NULL,
-    rarity_id       INT NOT NULL,
     condition_id    INT NOT NULL,
+    rarity          VARCHAR(50) DEFAULT NULL,              -- free text, display only
     purchase_price  DECIMAL(10,2) NOT NULL DEFAULT 0.00,   -- what they paid
     estimated_value DECIMAL(10,2) NOT NULL DEFAULT 0.00,   -- what it is worth now
     quantity        INT NOT NULL DEFAULT 1,
@@ -158,9 +169,8 @@ CREATE TABLE cards (
     image           VARCHAR(255) DEFAULT NULL,
     date_added      DATE NOT NULL DEFAULT (CURRENT_DATE),
 
-    FOREIGN KEY (user_id)      REFERENCES users (user_id)           ON DELETE CASCADE,
+    FOREIGN KEY (user_id)      REFERENCES users (user_id)          ON DELETE CASCADE,
     FOREIGN KEY (category_id)  REFERENCES categories (category_id),
-    FOREIGN KEY (rarity_id)    REFERENCES rarities (rarity_id),
     FOREIGN KEY (condition_id) REFERENCES conditions (condition_id)
 );
 
@@ -178,12 +188,16 @@ INSERT INTO users (username, email, password, role) VALUES
     ('admin', 'admin@cardvault.sg', SHA1('admin123'), 'admin');
 
 -- Starting reference lists. The admin can add to these in the app -- they are
--- seeded only so the app is usable on first run.
+-- seeded only so the app is usable on first run. If a collector has a card
+-- type that is not listed, the admin adds it: that is the admin's job.
 INSERT INTO categories (category_name) VALUES
-    ('Pokemon'), ('One Piece'), ('NBA'), ('Football'), ('Yu-Gi-Oh');
-
-INSERT INTO rarities (rarity_name) VALUES
-    ('Common'), ('Uncommon'), ('Rare'), ('Holo Rare'), ('Ultra Rare'), ('Secret Rare');
+    ('Pokemon'),
+    ('One Piece'),
+    ('Yu-Gi-Oh'),
+    ('Magic: The Gathering'),
+    ('NBA'),
+    ('Football'),
+    ('Formula 1');
 
 -- Ranked best to worst. Lower rank = better condition.
 INSERT INTO conditions (condition_name, condition_rank) VALUES

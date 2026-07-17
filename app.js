@@ -276,16 +276,21 @@ app.post('/login', (req, res) => {
 // A collector with 300 cards needs to find one. This is what makes "know what
 // you own" usable rather than just a long list.
 //
-// Routes: GET /view-collection  (search by card_name, filter by category /
-//         rarity / condition, sort by value or date added)
+// Routes: GET /view-collection  (search by card_name, filter by category and
+//         condition, sort by value / name / condition / date added)
 //
 // Work with Student C -- C renders the collection, F makes it searchable, so
 // the two of you share /view-collection. Agree who owns the route.
 //
-// Filtering only works because category/rarity/condition are ids pointing at
-// the admin-curated lists, not free text. Sort by condition using
-// conditions.condition_rank (1 = best) -- sorting on condition_name would put
-// Excellent before Mint, alphabetically.
+// Filter on category_id and condition_id only. Those are ids pointing at the
+// admin-curated lists, so the values are controlled and the filter is exact.
+//
+// DO NOT filter on cards.rarity -- it is free text. 'Holo Rare' / 'holo rare' /
+// 'Holo' are three different strings, so a rarity filter would silently miss
+// cards. Rarity is display only.
+//
+// Sort by condition using conditions.condition_rank (1 = best) -- sorting on
+// condition_name would put Excellent before Mint, alphabetically.
 // -----------------------------------------------------------------------------
 
 
