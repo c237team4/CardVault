@@ -66,21 +66,27 @@ const checkAuthenticated = (req, res, next) => {
 };
 
 // Middleware to check if user is admin
+// Note: req.session.user may be undefined (logged out), so check that FIRST --
+// reading .role off undefined would crash the server instead of redirecting.
 const checkAdmin = (req, res, next) => {
-    if (req.session.user.role === 'admin') {
+    if (req.session.user && req.session.user.role === 'admin') {
         return next();
     } else {
         req.flash('error', 'Access denied');
-        res.redirect('/shopping');
+        res.redirect('/dashboard');
     }
 };
 
 // Middleware for form validation
+// 'role' is deliberately NOT accepted from the form -- if it were, anyone could
+// register themselves as an admin. The database defaults role to 'user'.
 const validateRegistration = (req, res, next) => {
-    const { username, email, password, address, contact, role } = req.body;
+    const { username, email, password } = req.body;
 
-    if (!username || !email || !password || !address || !contact || !role) {
-        return res.status(400).send('All fields are required.');
+    if (!username || !email || !password) {
+        req.flash('error', 'All fields are required.');
+        req.flash('formData', req.body);
+        return res.redirect('/register');
     }
 
     if (password.length < 6) {
@@ -118,10 +124,102 @@ app.get('/logout', (req, res) => {
 
 
 // -----------------------------------------------------------------------------
-// STUDENT A  |  Owner: TODO
+// STUDENT A  |  Owner: Tan Boon Meng (25052694)
 // User Registration, Login and Access Control
 // Routes: GET /register, POST /register, GET /login, POST /login
 // -----------------------------------------------------------------------------
+
+// Show the registration form.
+// formData is whatever the user typed last time it failed validation, so the
+// form can be re-filled instead of making them type everything again.
+app.get('/register', (req, res) => {
+    res.render('register', {
+        messages: req.flash('error'),
+        formData: req.flash('formData')[0]
+    });
+});
+
+// Handle the registration form.
+// validateRegistration runs first -- if it redirects, this function never runs.
+app.post('/register', validateRegistration, (req, res) => {
+    const { username, email, password } = req.body;
+
+    // SHA1(?) hashes the password inside MySQL, so the plain password is never
+    // stored. role is not in this query -- the table defaults it to 'user'.
+    const sql = 'INSERT INTO users (username, email, password) VALUES (?, ?, SHA1(?))';
+
+    connection.query(sql, [username, email, password], (err, result) => {
+        if (err) {
+            // email is UNIQUE in the database. If it is already taken, MySQL
+            // rejects the INSERT with ER_DUP_ENTRY instead of creating a
+            // second account that login could not tell apart.
+            if (err.code === 'ER_DUP_ENTRY') {
+                req.flash('error', 'That email is already registered. Try logging in.');
+                req.flash('formData', req.body);
+                return res.redirect('/register');
+            }
+            console.error('Error registering user:', err);
+            return res.status(500).send('Error registering user');
+        }
+
+        req.flash('success', 'Registration successful! Please log in.');
+        res.redirect('/login');
+    });
+});
+
+// Show the login form.
+app.get('/login', (req, res) => {
+    res.render('login', {
+        messages: req.flash('success'),
+        errors: req.flash('error')
+    });
+});
+
+// Handle the login form.
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/login');
+    }
+
+    // Hash what was typed and compare it against the stored hash. We never
+    // decrypt the stored password -- SHA1 is one-way, so instead we hash the
+    // attempt the same way and check the two hashes match.
+    //
+    // The ? placeholders matter: mysql2 escapes the values, so a password like
+    //  ' OR '1'='1
+    // is treated as text to compare, not as SQL to run (SQL injection).
+    const sql = 'SELECT * FROM users WHERE email = ? AND password = SHA1(?)';
+
+    connection.query(sql, [email, password], (err, results) => {
+        if (err) {
+            console.error('Error logging in:', err);
+            return res.status(500).send('Error logging in');
+        }
+
+        if (results.length > 0) {
+            // Store the user on the session. Every later request carries a
+            // session cookie, which is how checkAuthenticated knows who this
+            // is without asking them to log in again on every page.
+            req.session.user = results[0];
+            req.flash('success', 'Login successful!');
+
+            // Send each role to the page that is useful to them.
+            if (req.session.user.role === 'admin') {
+                res.redirect('/admin-dashboard');
+            } else {
+                res.redirect('/dashboard');
+            }
+        } else {
+            // Deliberately vague: saying "wrong password" would confirm the
+            // email exists, which helps someone guessing accounts.
+            req.flash('error', 'Invalid email or password.');
+            res.redirect('/login');
+        }
+    });
+});
 
 
 
