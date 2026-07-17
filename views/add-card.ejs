@@ -1,10 +1,34 @@
 <%- include('partials/header', { title: 'Add Card - CardVault' }) %>
 
 <!-- ============================================================
-     ADD CARD  |  Owner: TODO (Student B - Adding Information)
-     Form: name, set, year, purchase price, condition metrics
-     (surface/edges/corners/centering), image upload, trade flag.
-     Posts to: POST /add-card  (multipart/form-data for multer)
+     ADD CARD  |  Owner: Ryan (Student B - Adding Information)
+
+     Posts to: POST /add-card
+     Form tag MUST have enctype="multipart/form-data" or the image
+     never arrives and req.file is undefined with no error.
+
+     FIELDS (name= must match exactly):
+       card_name        text      required
+       genre_id         DROPDOWN  required  <- from genres table
+       category         free text required  e.g. Pokemon, NBA
+       condition_id     DROPDOWN  required  <- from conditions table,
+                                  ORDER BY condition_rank
+       rarity           free text optional  e.g. Holo Rare, Rookie
+       purchase_price   number    required  step="0.01" min="0"
+       estimated_value  number    required  step="0.01" min="0"
+       quantity         number    required  min="1", default 1
+       remarks          textarea  optional
+       image            file      optional
+
+     NOT on the form:
+       user_id     comes from req.session.user.user_id -- never a
+                   hidden field, that could be edited in DevTools
+       date_added  the database fills it (DEFAULT curdate())
+       card_id     AUTO_INCREMENT
+
+     Only TWO dropdowns: genre_id and condition_id. Both must be read
+     from the database, not hardcoded -- the spec gives no marks for
+     hardcoded content, and they must reflect what the admin curates.
      ============================================================ -->
 
 

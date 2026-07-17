@@ -177,12 +177,12 @@ Open `app.js` and scroll to the `ROUTES` section. It's split into six labelled b
 
 | Block | Owner | Responsibility | Views you own |
 | --- | --- | --- | --- |
-| **A** | Tan Boon Meng | Registration, Login, Access Control | `login.ejs`, `register.ejs` |
-| **B** | _unclaimed_ | Adding a card | `add-card.ejs` |
-| **C** | _unclaimed_ | Dashboard + viewing cards | `dashboard.ejs`, `view-collection.ejs` |
-| **D** | _unclaimed_ | Editing a card | `edit-card.ejs` |
-| **E** | _unclaimed_ | Deleting cards + admin (users, genres, conditions) | `admin-dashboard.ejs` |
-| **F** | _unclaimed_ | Search / filter / sort your own collection | `view-collection.ejs` (shared with C) |
+| **A** | Boon Meng | Registration, Login, Access Control | `login.ejs`, `register.ejs` |
+| **B** | Ryan | Adding a card | `add-card.ejs` |
+| **C** | Sammi | Dashboard + viewing cards | `dashboard.ejs`, `view-collection.ejs` |
+| **D** | Ezann | Editing a card | `edit-card.ejs` |
+| **E** | Rainie | Deleting cards + admin (users, genres, conditions) | `admin-dashboard.ejs` |
+| **F** | Zhan Fung | Search / filter / sort your own collection | `view-collection.ejs` (shared with C) |
 
 **Why this matters:** Git merges cleanly when people change *different lines*. It gets confused when two people change the *same* lines. Staying inside your own block means you can all work at the same time without fighting.
 

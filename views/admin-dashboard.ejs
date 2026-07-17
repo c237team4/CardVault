@@ -1,9 +1,27 @@
 <%- include('partials/header', { title: 'Admin Dashboard - CardVault' }) %>
 
 <!-- ============================================================
-     ADMIN DASHBOARD  |  Owner: TODO (Student E - Removing/Moderation)
-     Admin-only. Manage users and moderate/remove listed cards.
-     Renders with: user, users, cards
+     ADMIN DASHBOARD  |  Owner: Rainie (Student E)
+
+     Admin only -- the route needs checkAuthenticated AND checkAdmin.
+
+     The admin is an operator, not one of our target users. Two jobs:
+
+       1. Manage user accounts
+          List users, search/filter them, and deactivate an account
+          by setting users.is_active = 0.
+          Deactivate, do NOT delete: deleting a user CASCADES and
+          destroys their whole collection. Login already checks
+          is_active, so setting it to 0 locks them out immediately.
+
+       2. Curate the reference lists  (genres, conditions)
+          These are what make Zhan Fung's filtering work -- free text
+          cannot be filtered reliably. CRUD on both.
+          Deleting a genre still used by cards is blocked by the
+          database (ER_ROW_IS_REFERENCED_2). Catch it and show a
+          friendly message rather than a crash.
+
+     Renders with: user, users  (+ genres / conditions for the lists)
      ============================================================ -->
 
 

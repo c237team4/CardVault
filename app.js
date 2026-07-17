@@ -234,7 +234,7 @@ app.post('/login', (req, res) => {
 
 
 // -----------------------------------------------------------------------------
-// STUDENT B  |  Owner: TODO
+// STUDENT B  |  Owner: Ryan
 // Adding New Information -- add a card to your collection
 // Routes: GET /add-card, POST /add-card   (POST uses upload.single('image'))
 // -----------------------------------------------------------------------------
@@ -243,16 +243,35 @@ app.post('/login', (req, res) => {
 
 
 // -----------------------------------------------------------------------------
-// STUDENT C  |  Owner: TODO
+// STUDENT C  |  Owner: Sammi
 // Viewing and Displaying Information
-// Routes: GET /dashboard, GET /view-collection, GET /card/:id
+// Routes: GET /dashboard, GET /view-collection
+//
+// /dashboard is where our whole pitch lands -- "know what you own and what it
+// cost". Tiles: total cards, total paid, current value, gain.
+//
+//   SUM(purchase_price * quantity)   NOT SUM(purchase_price)
+//   A row can be 3 physical cards. Ryan is 8 rows but 12 cards. Forget the
+//   * quantity and every total is wrong and still looks fine.
+//
+//   A new user has no cards, and SUM() returns NULL there, not 0 -- so the
+//   gain % divides by null and prints NaN on the first page they ever see.
+//   COALESCE(SUM(...), 0) or check for zero and show an empty state.
+//   Log in as admin@cardvault.sg (0 cards) to test this.
+//
+// /view-collection is SHARED with Zhan Fung (F) -- you own the route, the
+// query and the display; F owns the filter form and the WHERE/ORDER BY logic.
+// Agree the split before you both start.
+//
+// Every query needs WHERE user_id = ? from the session, or you are showing
+// other people's collections.
 // -----------------------------------------------------------------------------
 
 
 
 
 // -----------------------------------------------------------------------------
-// STUDENT D  |  Owner: TODO
+// STUDENT D  |  Owner: Ezann
 // Editing Existing Information
 // Routes: GET /edit-card/:id, POST /edit-card/:id
 // -----------------------------------------------------------------------------
@@ -261,7 +280,7 @@ app.post('/login', (req, res) => {
 
 
 // -----------------------------------------------------------------------------
-// STUDENT E  |  Owner: TODO
+// STUDENT E  |  Owner: Rainie
 // Removing Information + admin moderation
 // Routes: POST /delete-card/:id, GET /admin-dashboard
 // -----------------------------------------------------------------------------
@@ -270,7 +289,7 @@ app.post('/login', (req, res) => {
 
 
 // -----------------------------------------------------------------------------
-// STUDENT F  |  Owner: TODO
+// STUDENT F  |  Owner: Zhan Fung
 // Searching, Filtering and Organising -- over the user's OWN collection
 //
 // A collector with 300 cards needs to find one. This is what makes "know what

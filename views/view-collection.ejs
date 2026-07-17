@@ -1,10 +1,25 @@
 <%- include('partials/header', { title: 'My Collection - CardVault' }) %>
 
 <!-- ============================================================
-     MY COLLECTION  |  Owner: TODO (Student C - Viewing/Display)
-     Lists the logged-in user's cards. Each row links to
-     /card/:id for the full condition breakdown.
-     Renders with: user, cards
+     MY COLLECTION
+     Owner: Sammi (Student C - the list)
+            Zhan Fung (Student F - the search/filter form)
+
+     SHARED FILE. Agree the split before you both start:
+       Sammi  owns the route, the query, and how a card is displayed
+       Zhan Fung owns the filter form at the top, and the WHERE /
+                 ORDER BY logic that Sammi's query uses
+
+     Renders with: user, cards  (+ whatever F needs for the filters)
+
+     Every query here MUST have  WHERE user_id = ?  from the session.
+     Without it you are showing other people's collections.
+
+     Filters (see Student F's block in app.js for detail):
+       genre_id      exact    AND c.genre_id = ?
+       condition_id  exact    AND c.condition_id = ?
+       category      LIKE     AND c.category LIKE ?   with '%term%'
+       rarity        DO NOT FILTER -- free text, display only
      ============================================================ -->
 
 
