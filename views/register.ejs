@@ -1,37 +1,8 @@
 <%- include('partials/header', { title: 'Register - CardVault' }) %>
 
-<!-- ============================================================
-     REGISTER  |  Owner: Tan Boon Meng (25052694)
 
-     WHAT THE ROUTE GIVES YOU  (app.js, GET /register):
-        messages   array of error strings from req.flash('error')
-                   empty [] on a normal first visit
-        formData   object of what they typed last time, OR undefined
-                   on a first visit. Guard for undefined.
 
-     WHAT IT MUST DO:
-       1. Form posts to  /register  with method POST
-       2. Three inputs, name= must match exactly:
-             name="username"   text
-             name="email"      email
-             name="password"   password, at least 6 characters
-       3. If messages has anything in it, show the errors
-       4. Sticky form: re-fill username and email from formData after a
-          failed attempt, so they do not retype everything.
-          Never re-fill the password.
-       5. NO role field. If the user could pick their own role, anyone
-          could register as an admin. The database defaults it to 'user'.
-       6. A link to /login for people who already have an account
 
-     TEST IT:
-        node app.js  ->  http://localhost:3000/register
-        - submit empty              -> should bounce back with an error
-        - password '123'            -> error, and username/email still filled
-        - reuse ryan@demo.sg        -> 'email already registered'
-        - valid new details         -> lands on /login with a green message
-     ============================================================ -->
-
-<%# TODO: write the form here %>
 
 
 <%- include('partials/footer') %>
