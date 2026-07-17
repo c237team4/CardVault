@@ -6,31 +6,9 @@ Node.js + Express + EJS + MySQL.
 
 ---
 
-## Part 1 — One-time setup
+## Part 1 — Setup
 
-Do this once, on your own laptop. Takes about 15 minutes.
-
-### Step 1: Install the tools
-
-Install these three if you don't already have them.
-
-| Tool | Where | How to check it worked |
-|---|---|---|
-| **Node.js** (LTS version) | https://nodejs.org | Open a terminal, type `node -v` |
-| **Git** | https://git-scm.com/downloads | `git --version` |
-| **VS Code** | https://code.visualstudio.com | It opens |
-
-To open a terminal in VS Code: **Terminal → New Terminal** from the top menu.
-
-If `node -v` prints something like `v24.15.0`, it worked. If it says *"command not found"* or *"not recognized"*, close the terminal, open a new one, and try again — installers often need a fresh terminal. If it still fails, restart your laptop.
-
-### Step 2: Make a GitHub account
-
-Go to https://github.com and sign up if you don't have an account.
-
-**Send your GitHub username to Boon Meng** so he can invite you to the repo. You'll get an email invitation — click **Accept**. You cannot push code until you accept.
-
-### Step 3: Tell Git who you are
+### Step 1: Tell Git who you are
 
 This is important. It stamps your name on every commit you make, which is **how the lecturer sees what you personally contributed**. Get it wrong and your work looks like someone else's.
 
@@ -50,7 +28,7 @@ git config --global user.email
 
 It should print what you just typed.
 
-### Step 4: Download the project
+### Step 2: Download the project
 
 Pick a folder where you keep your work — this example uses `C:\C237`. In the terminal:
 
@@ -60,11 +38,12 @@ git clone https://github.com/c237team4/CardVault.git
 cd CardVault
 ```
 
-Git may ask you to log in to GitHub. Follow the browser popup and sign in.
+Git may ask you to log in to GitHub. Follow the browser popup and using our team google account (look at our MS Team) to sign in.
 
-### Step 5: Install the project's libraries
+### Step 3: Install the project's libraries
 
 ```bash
+# Run this inside your CardVault folder (C:\C237\CardVault)
 npm install
 ```
 
@@ -72,9 +51,10 @@ This reads `package.json` and downloads Express, EJS, MySQL and the rest into a 
 
 > **`node_modules` is not in Git on purpose.** It's thousands of files that anyone can regenerate with `npm install`, and the CA2 spec says the submission zip must exclude it. Never add it to Git.
 
-### Step 6: Run it
+### Step 4: Run it
 
 ```bash
+# Run this inside your CardVault folder (C:\C237\CardVault)
 node app.js
 ```
 
@@ -87,7 +67,7 @@ Connected to MySQL database
 
 Open **http://localhost:3000** in your browser. You should see the CardVault navbar.
 
-**To stop the server, press `Ctrl + C` in the terminal.**
+**Now stop the server, press `Ctrl + C` in the terminal.**
 
 If you got both lines and the page loads — setup is done.
 
@@ -100,10 +80,11 @@ Four steps, every single time you sit down to work. Do them in order.
 ### 1. Pull first — ALWAYS
 
 ```bash
+# Run this inside your CardVault folder (C:\C237\CardVault)
 git pull
 ```
 
-**Do this before you write anything.** It brings in your teammates' latest work. Skipping this step is the #1 cause of merge conflicts. If you code for two hours and *then* pull, you're in for a bad afternoon.
+**Do this before you write anything.** It brings in your teammates' latest work. Skipping this step is the #1 cause of merge conflicts.
 
 ### 2. Do your work
 
@@ -112,6 +93,7 @@ Edit **only your own section**. See *Who owns what* below.
 ### 3. Test before you commit
 
 ```bash
+# Run this inside your CardVault folder (C:\C237\CardVault)
 node app.js
 ```
 
@@ -128,7 +110,7 @@ git push
 
 Note the `git pull` *before* `git push`. If a teammate pushed while you were working, this pulls their changes in first. Without it, your push gets rejected.
 
-Write commit messages that say what you did. `"Add login validation"` is useful. `"update"`, `"fix"`, `"asdf"` are not — and the lecturer reads this history.
+Write commit messages that say what you did. `"Add login validation"` is useful.
 
 ---
 
@@ -143,20 +125,20 @@ Open `app.js` and scroll to the `ROUTES` section. It's split into six labelled b
 
 **Put your name where it says `Owner: TODO`.** Then only add code inside your own block.
 
-| Block | Responsibility | Views you own |
-|---|---|---|
-| **A** | Registration, Login, Access Control | `login.ejs`, `register.ejs` |
-| **B** | Adding a card | `add-card.ejs` |
-| **C** | Viewing / displaying cards | `dashboard.ejs`, `view-collection.ejs` |
-| **D** | Editing a card | `edit-card.ejs` |
-| **E** | Deleting cards + admin moderation | `admin-dashboard.ejs` |
-| **F** | Search / filter / sort (marketplace) | `marketplace.ejs` |
+| Block       | Responsibility                       | Views you own                              |
+| ----------- | ------------------------------------ | ------------------------------------------ |
+| **A** | Registration, Login, Access Control  | `login.ejs`, `register.ejs`            |
+| **B** | Adding a card                        | `add-card.ejs`                           |
+| **C** | Viewing / displaying cards           | `dashboard.ejs`, `view-collection.ejs` |
+| **D** | Editing a card                       | `edit-card.ejs`                          |
+| **E** | Deleting cards + admin moderation    | `admin-dashboard.ejs`                    |
+| **F** | Search / filter / sort (marketplace) | `marketplace.ejs`                        |
 
 **Why this matters:** Git merges cleanly when people change *different lines*. It gets confused when two people change the *same* lines. Staying inside your own block means you can all work at the same time without fighting.
 
 ### Shared files — coordinate before touching
 
-These belong to everyone, so tell the group chat before editing:
+These belong to everyone, so inform in the group chat before editing:
 
 - `views/partials/header.ejs` — the navbar
 - `views/partials/footer.ejs`
@@ -172,6 +154,7 @@ These belong to everyone, so tell the group chat before editing:
 You skipped `npm install`, or a teammate added a new library.
 
 ```bash
+# Run this inside your CardVault folder (C:\C237\CardVault)
 npm install
 ```
 
@@ -190,6 +173,7 @@ Usually the campus network or Wi-Fi. Check you're online. If your internet is fi
 A teammate pushed before you. Fix:
 
 ```bash
+# Run these inside your CardVault folder (C:\C237\CardVault)
 git pull
 git push
 ```
@@ -225,10 +209,9 @@ Harmless. Windows and Git disagree about invisible line-ending characters. Ignor
 Your last commit is safe. This throws away **uncommitted** changes only:
 
 ```bash
+# Run this inside your CardVault folder (C:\C237\CardVault)
 git checkout .
 ```
-
-Nuclear option — delete the whole folder and clone again from Step 4. You only lose work you never pushed.
 
 ---
 
