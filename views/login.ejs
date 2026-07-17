@@ -2,52 +2,34 @@
 
 <!-- ============================================================
      LOGIN  |  Owner: Tan Boon Meng (25052694)
-     Renders with: messages (flash success), errors (flash error)
-     Posts to: POST /login
+
+     WHAT THE ROUTE GIVES YOU  (app.js, GET /login):
+        messages   array of SUCCESS strings from req.flash('success')
+                   e.g. 'Registration successful! Please log in.'
+        errors     array of ERROR strings from req.flash('error')
+                   e.g. 'Invalid email or password.'
+
+     Two separate variables on purpose -- one is good news, one is bad
+     news, and they should not look the same.
+
+     WHAT IT MUST DO:
+       1. Form posts to  /login  with method POST
+       2. Two inputs, name= must match exactly:
+             name="email"      email
+             name="password"   password
+       3. If messages has anything, show it as a SUCCESS (green)
+       4. If errors has anything, show it as an ERROR (red)
+       5. A link to /register for people with no account yet
+
+     TEST IT:
+        node app.js  ->  http://localhost:3000/login
+        - register first             -> green 'Registration successful'
+        - wrong password             -> red 'Invalid email or password'
+        - ryan@demo.sg / demo123     -> lands on /dashboard
+        - admin@cardvault.sg / admin123 -> lands on /admin-dashboard
      ============================================================ -->
 
-<div class="row justify-content-center">
-  <div class="col-md-5">
+<%# TODO: write the form here %>
 
-    <h2 class="mb-3">Log in to CardVault</h2>
-
-    <%# 'messages' carries success (e.g. just registered), 'errors' carries
-        failures (e.g. wrong password). Two separate flash keys so they can be
-        styled differently. %>
-    <% if (messages && messages.length > 0) { %>
-      <div class="alert alert-success">
-        <% messages.forEach(msg => { %>
-          <div><%= msg %></div>
-        <% }) %>
-      </div>
-    <% } %>
-
-    <% if (errors && errors.length > 0) { %>
-      <div class="alert alert-danger">
-        <% errors.forEach(msg => { %>
-          <div><%= msg %></div>
-        <% }) %>
-      </div>
-    <% } %>
-
-    <form action="/login" method="POST">
-
-      <div class="mb-3">
-        <label class="form-label" for="email">Email</label>
-        <input class="form-control" type="email" id="email" name="email" required>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label" for="password">Password</label>
-        <input class="form-control" type="password" id="password" name="password" required>
-      </div>
-
-      <button class="btn btn-primary w-100" type="submit">Log in</button>
-    </form>
-
-    <p class="mt-3 mb-0">No account yet? <a href="/register">Register</a></p>
-
-  </div>
-</div>
 
 <%- include('partials/footer') %>

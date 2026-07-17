@@ -2,58 +2,36 @@
 
 <!-- ============================================================
      REGISTER  |  Owner: Tan Boon Meng (25052694)
-     Renders with: messages (flash error), formData (sticky form)
-     Posts to: POST /register
+
+     WHAT THE ROUTE GIVES YOU  (app.js, GET /register):
+        messages   array of error strings from req.flash('error')
+                   empty [] on a normal first visit
+        formData   object of what they typed last time, OR undefined
+                   on a first visit. Guard for undefined.
+
+     WHAT IT MUST DO:
+       1. Form posts to  /register  with method POST
+       2. Three inputs, name= must match exactly:
+             name="username"   text
+             name="email"      email
+             name="password"   password, at least 6 characters
+       3. If messages has anything in it, show the errors
+       4. Sticky form: re-fill username and email from formData after a
+          failed attempt, so they do not retype everything.
+          Never re-fill the password.
+       5. NO role field. If the user could pick their own role, anyone
+          could register as an admin. The database defaults it to 'user'.
+       6. A link to /login for people who already have an account
+
+     TEST IT:
+        node app.js  ->  http://localhost:3000/register
+        - submit empty              -> should bounce back with an error
+        - password '123'            -> error, and username/email still filled
+        - reuse ryan@demo.sg        -> 'email already registered'
+        - valid new details         -> lands on /login with a green message
      ============================================================ -->
 
-<div class="row justify-content-center">
-  <div class="col-md-5">
+<%# TODO: write the form here %>
 
-    <h2 class="mb-3">Create your account</h2>
-
-    <%# Show any validation errors the register route flashed back %>
-    <% if (messages && messages.length > 0) { %>
-      <div class="alert alert-danger">
-        <% messages.forEach(msg => { %>
-          <div><%= msg %></div>
-        <% }) %>
-      </div>
-    <% } %>
-
-    <form action="/register" method="POST">
-
-      <%# value=... re-fills the form after a failed attempt, so the user does
-          not have to retype everything. formData is undefined on first load,
-          hence the guard. %>
-      <div class="mb-3">
-        <label class="form-label" for="username">Username</label>
-        <input class="form-control" type="text" id="username" name="username"
-               value="<%= formData ? formData.username : '' %>" required>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label" for="email">Email</label>
-        <input class="form-control" type="email" id="email" name="email"
-               value="<%= formData ? formData.email : '' %>" required>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label" for="password">Password</label>
-        <input class="form-control" type="password" id="password" name="password"
-               minlength="6" required>
-        <div class="form-text">At least 6 characters.</div>
-      </div>
-
-      <%# No role field on purpose. If the user could choose their own role,
-          anyone could register as an admin. New accounts default to 'user'
-          in the database; admins are seeded in cardvault.sql. %>
-
-      <button class="btn btn-primary w-100" type="submit">Register</button>
-    </form>
-
-    <p class="mt-3 mb-0">Already have an account? <a href="/login">Log in</a></p>
-
-  </div>
-</div>
 
 <%- include('partials/footer') %>
