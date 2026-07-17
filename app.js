@@ -271,8 +271,21 @@ app.post('/login', (req, res) => {
 
 // -----------------------------------------------------------------------------
 // STUDENT F  |  Owner: TODO
-// Searching, Filtering and Organising -- the public trade board
-// Routes: GET /marketplace   (search by name/set, filter by condition, sort)
+// Searching, Filtering and Organising -- over the user's OWN collection
+//
+// A collector with 300 cards needs to find one. This is what makes "know what
+// you own" usable rather than just a long list.
+//
+// Routes: GET /view-collection  (search by card_name, filter by category /
+//         rarity / condition, sort by value or date added)
+//
+// Work with Student C -- C renders the collection, F makes it searchable, so
+// the two of you share /view-collection. Agree who owns the route.
+//
+// Filtering only works because category/rarity/condition are ids pointing at
+// the admin-curated lists, not free text. Sort by condition using
+// conditions.condition_rank (1 = best) -- sorting on condition_name would put
+// Excellent before Mint, alphabetically.
 // -----------------------------------------------------------------------------
 
 

@@ -132,7 +132,7 @@ Open `app.js` and scroll to the `ROUTES` section. It's split into six labelled b
 | **C** | Viewing / displaying cards           | `dashboard.ejs`, `view-collection.ejs` |
 | **D** | Editing a card                       | `edit-card.ejs`                          |
 | **E** | Deleting cards + admin moderation    | `admin-dashboard.ejs`                    |
-| **F** | Search / filter / sort (marketplace) | `marketplace.ejs`                        |
+| **F** | Search / filter / sort your own collection | `view-collection.ejs` (shared with C) |
 
 **Why this matters:** Git merges cleanly when people change *different lines*. It gets confused when two people change the *same* lines. Staying inside your own block means you can all work at the same time without fighting.
 
