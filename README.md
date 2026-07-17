@@ -49,6 +49,10 @@ npm install
 
 This reads `package.json` and downloads Express, EJS, MySQL and the rest into a `node_modules` folder. It takes a minute and prints a lot of text. That's normal.
 
+> ⚠️ **Do NOT run `npm init -y`.** That command is for starting a brand new project — it will **overwrite `package.json`** and wipe our dependency list, breaking the app for all six of us. We only ever run `npm install`.
+>
+> You also don't need `npm install express`, `npm install ejs`, and so on one by one. That's for building a project from scratch. `npm install` on its own reads `package.json` and installs everything at the pinned versions.
+
 > **`node_modules` is not in Git on purpose.** It's thousands of files that anyone can regenerate with `npm install`, and the CA2 spec says the submission zip must exclude it. Never add it to Git.
 
 ### Step 4: Run it
@@ -70,6 +74,52 @@ Open **http://localhost:3000** in your browser. You should see the CardVault nav
 **Now stop the server, press `Ctrl + C` in the terminal.**
 
 If you got both lines and the page loads — setup is done.
+
+---
+
+## The database — read this before you touch it
+
+**You do not need to install MySQL.** The database already exists on Azure, and the login details are in `app.js`. If you saw `Connected to MySQL database`, you are already on it.
+
+**We all share ONE database.** There is no copy on your laptop. When you add a card, everyone sees it. When you break something, everyone gets it.
+
+### 🚨 Do NOT run `database/cardvault.sql`
+
+That file starts with `DROP TABLE` — it deletes every table and rebuilds them empty. Running it wipes **everyone's** data, including whatever your teammates were testing with.
+
+The database is already set up. You never need to run it.
+
+If it genuinely has to be re-run (a schema change we all agreed on), **say so in the group chat first** so nobody loses work mid-task.
+
+### The tables
+
+| Table | What's in it | Owner |
+|---|---|---|
+| `users` | accounts, roles | Student A |
+| `cards` | everyone's collections | B / C / D / E / F |
+| `genres` | Trading Card Games, Sport Cards, Others | admin-curated |
+| `conditions` | Mint → Poor, with `condition_rank` (1 = best) | admin-curated |
+
+`database/cardvault.sql` is our schema — **read it**. Every column has a comment explaining why it is the way it is, and you will be asked to justify your own feature's columns.
+
+### Test logins
+
+Already in the database, ready to use:
+
+| Email | Password | What they have |
+|---|---|---|
+| `ryan@demo.sg` | `demo123` | Pokemon collector, 12 cards, ~S$28k |
+| `mei@demo.sg` | `demo123` | Sports collector, 12 cards, ~S$5.6k |
+| `jun@demo.sg` | `demo123` | Casual, 16 cards, ~S$420 |
+| `admin@cardvault.sg` | `admin123` | Admin, **no cards** (use this to test empty states) |
+
+You can also register your own account at `/register`.
+
+### Two traps in the demo data
+
+**Ryan's categories are spelled three different ways on purpose** — `Pokemon`, `pokemon`, `Pokémon`. That is not a typo. It proves the `LIKE` filter still finds all of them, because our database collation ignores case and accents. **Do not "fix" them.**
+
+**`quantity` can be more than 1.** Ryan has 8 rows but 12 actual cards. Any total that forgets `* quantity` will be wrong and still look fine. Watch for this in dashboards and totals.
 
 ---
 
@@ -125,16 +175,22 @@ Open `app.js` and scroll to the `ROUTES` section. It's split into six labelled b
 
 **Put your name where it says `Owner: TODO`.** Then only add code inside your own block.
 
-| Block       | Responsibility                       | Views you own                              |
-| ----------- | ------------------------------------ | ------------------------------------------ |
-| **A** | Registration, Login, Access Control  | `login.ejs`, `register.ejs`            |
-| **B** | Adding a card                        | `add-card.ejs`                           |
-| **C** | Viewing / displaying cards           | `dashboard.ejs`, `view-collection.ejs` |
-| **D** | Editing a card                       | `edit-card.ejs`                          |
-| **E** | Deleting cards + admin moderation    | `admin-dashboard.ejs`                    |
-| **F** | Search / filter / sort your own collection | `view-collection.ejs` (shared with C) |
+| Block | Owner | Responsibility | Views you own |
+| --- | --- | --- | --- |
+| **A** | Tan Boon Meng | Registration, Login, Access Control | `login.ejs`, `register.ejs` |
+| **B** | _unclaimed_ | Adding a card | `add-card.ejs` |
+| **C** | _unclaimed_ | Dashboard + viewing cards | `dashboard.ejs`, `view-collection.ejs` |
+| **D** | _unclaimed_ | Editing a card | `edit-card.ejs` |
+| **E** | _unclaimed_ | Deleting cards + admin (users, genres, conditions) | `admin-dashboard.ejs` |
+| **F** | _unclaimed_ | Search / filter / sort your own collection | `view-collection.ejs` (shared with C) |
 
 **Why this matters:** Git merges cleanly when people change *different lines*. It gets confused when two people change the *same* lines. Staying inside your own block means you can all work at the same time without fighting.
+
+### Two overlaps to sort out at the first meeting
+
+**C and F share `/view-collection`.** C renders the collection; F makes it searchable. Same route, same view — so agree the split before either starts. Suggested: C owns the route and the view file, F owns the filter logic that C's query calls.
+
+**E owns the admin.** That means the reference lists (`genres`, `conditions`) and user management. It is not optional decoration — the admin curating those lists is *why* F's filtering works, and it is how we demonstrate having two roles.
 
 ### Shared files — coordinate before touching
 
@@ -144,6 +200,7 @@ These belong to everyone, so inform in the group chat before editing:
 - `views/partials/footer.ejs`
 - The `SHARED` block in `app.js`
 - `package.json`
+- `database/cardvault.sql` — see the database warning above
 
 ---
 
