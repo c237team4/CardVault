@@ -107,7 +107,6 @@ Already in the database, ready to use:
 
 You can also register your own account at `/register`.
 
-
 ---
 
 ## Part 2 — The daily routine
@@ -140,7 +139,7 @@ Check your page in the browser. **Never commit code that doesn't run** — it br
 
 ```bash
 git add .
-git commit -m "Add card search filter"
+git commit -m "Change this comment to your own comment e.g Add search filter"
 git pull
 git push
 ```
