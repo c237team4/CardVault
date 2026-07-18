@@ -129,6 +129,8 @@ app.get('/logout', (req, res) => {
 // Routes: GET /register, POST /register, GET /login, POST /login
 // -----------------------------------------------------------------------------
 
+// Step 1 - GET /Register
+
 app.get('/register', (req, res) => {
     res.render('register', {
         messages: req.flash('error'),
@@ -136,7 +138,26 @@ app.get('/register', (req, res) => {
     });
 });
 
+// Step 3 - POST /Register
 
+app.post('/register', validateRegistration, (req, res) => {
+    const { username, email, password } = req.body;
+
+    const sql = 'INSERT INTO users (username, email, password) VALUES (?, ?, SHA1(?))';
+    connection.query(sql, [username, email, password], (err, result) => {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                req.flash('error', 'That email is already registered. Try logging in.');
+                req.flash('formData', req.body);
+                return res.redirect('/register');
+            }
+            console.error('Error registering user:', err);
+            return res.status(500).send('Error registering user');
+        }
+        req.flash('success', 'Registration successful! Please log in.');
+        res.redirect('/login');
+    });
+});
 
 
 // -----------------------------------------------------------------------------
