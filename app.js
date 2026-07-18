@@ -233,7 +233,7 @@ app.post('/login', (req, res) => {
 // -----------------------------------------------------------------------------
 // STUDENT E  |  Owner: Rainie
 // Removing Information + admin moderation
-// Routes: POST /delete-card/:id, GET /admin-dashboard
+// Routes: POST /delete-card/:id
 // -----------------------------------------------------------------------------
 
 
@@ -246,7 +246,90 @@ app.post('/login', (req, res) => {
 // -----------------------------------------------------------------------------
 
 
+// -----------------------------------------------------------------------------
+// Admin Dashboard
+// View Admin Dashboard
+app.get('/admin-dashboard', checkAuthenticated, checkAdmin, (req, res) => {
 
+    // Total users
+    const totalUsersSql = "SELECT COUNT(*) AS totalUsers FROM users WHERE is_active = 1";
+
+    // Total cards
+    const totalCardsSql = "SELECT COUNT(*) AS totalCards FROM cards";
+
+    // All registered users
+    const usersSql = `
+        SELECT user_id, username, email, role, date_joined
+        FROM users
+        WHERE is_active = 1
+        ORDER BY username
+    `;
+
+    connection.query(totalUsersSql, (err, userCount) => {
+        if (err) throw err;
+
+        connection.query(totalCardsSql, (err, cardCount) => {
+            if (err) throw err;
+
+            connection.query(usersSql, (err, users) => {
+                if (err) throw err;
+
+                res.render('admin-dashboard', {
+                    user: req.session.user,
+                    totalUsers: userCount[0].totalUsers,
+                    totalCards: cardCount[0].totalCards,
+                    users: users
+                });
+            });
+        });
+    });
+
+});
+
+
+// View one user's collection
+app.get('/admin/user/:id', checkAuthenticated, checkAdmin, (req, res) => {
+
+    const userId = req.params.id;
+
+    const userSql = `
+        SELECT user_id, username, email
+        FROM users
+        WHERE user_id = ?
+    `;
+
+    const cardsSql = `
+        SELECT cards.*,
+               conditions.condition_name
+        FROM cards
+        LEFT JOIN conditions
+        ON cards.condition_id = conditions.condition_id
+        WHERE cards.user_id = ?
+        ORDER BY date_added DESC
+    `;
+
+    connection.query(userSql, [userId], (err, userResult) => {
+        if (err) throw err;
+
+        if (userResult.length === 0) {
+            return res.send("User not found.");
+        }
+
+        connection.query(cardsSql, [userId], (err, cards) => {
+            if (err) throw err;
+
+            res.render('admin-view-collection', {
+                user: req.session.user,
+                selectedUser: userResult[0],
+                cards: cards
+            });
+
+        });
+
+    });
+
+});
+// -----------------------------------------------------------------------------
 
 // =============================================================================
 
