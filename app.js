@@ -129,7 +129,12 @@ app.get('/logout', (req, res) => {
 // Routes: GET /register, POST /register, GET /login, POST /login
 // -----------------------------------------------------------------------------
 
-
+app.get('/register', (req, res) => {
+    res.render('register', {
+        messages: req.flash('error'),
+        formData: req.flash('formData')[0]
+    });
+});
 
 
 
