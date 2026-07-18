@@ -169,6 +169,39 @@ app.get('/login', (req, res) => {
     });
 });
 
+// Step 4c POST /login
+
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/login');
+    }
+
+    const sql = 'SELECT * FROM users WHERE email = ? AND password = SHA1(?)';
+    connection.query(sql, [email, password], (err, results) => {
+        if (err) {
+            console.error('Error logging in:', err);
+            return res.status(500).send('Error logging in');
+        }
+
+        if (results.length > 0) {
+            req.session.user = results[0];
+            req.flash('success', 'Login successful!');
+
+            if (req.session.user.role === 'admin') {
+                res.redirect('/admin-dashboard');
+            } else {
+                res.redirect('/dashboard');
+            }
+        } else {
+            req.flash('error', 'Invalid email or password.');
+            res.redirect('/login');
+        }
+    });
+});
+
 
 
 // -----------------------------------------------------------------------------
