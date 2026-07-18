@@ -16,17 +16,18 @@
 
     <%# Step 2a - Registration form creation %>
 
-    <form action="/register" method="POST" class="mt-4">
 
     <form action="/register" method="POST" class="mt-4">
         <div class="form-group mb-3">
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" class="form-control" required>
+            <input type="text" id="username" name="username" class="form-control" required
+                <% if (formData && formData.username) { %> value="<%= formData.username %>" <% } else { %> value="" <% } %>>
         </div>
 
         <div class="form-group mb-3">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" class="form-control" required>
+            <input type="email" id="email" name="email" class="form-control" required
+                <% if (formData && formData.email) { %> value="<%= formData.email %>" <% } else { %> value="" <% } %>>
         </div>
 
         <div class="form-group mb-3">
