@@ -159,6 +159,17 @@ app.post('/register', validateRegistration, (req, res) => {
     });
 });
 
+// Step 4a GET /login
+
+
+app.get('/login', (req, res) => {
+    res.render('login', {
+        messages: req.flash('success'),
+        errors: req.flash('error')
+    });
+});
+
+
 
 // -----------------------------------------------------------------------------
 // STUDENT B  |  Owner: Ryan
