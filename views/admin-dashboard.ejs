@@ -5,11 +5,26 @@
     <div class="container">
 
         <!-- Page Title -->
-        <div class="text-center mb-5">
-            <h1 class="fw-bold">Admin Dashboard</h1>
-            <p class="text-muted">
-                View registered users and monitor the CardVault system.
-            </p>
+        <div class="d-flex justify-content-between align-items-center mb-5">
+
+            <div>
+
+                <h1 class="fw-bold mb-1">
+                    Admin Dashboard
+                </h1>
+
+                <p class="text-muted mb-0">
+                    View registered users and monitor the CardVault system.
+                </p>
+
+            </div>
+
+            <a href="/admin/all-cards" class="btn btn-success">
+
+                View All Cards
+
+            </a>
+
         </div>
 
         <!-- Statistics -->
@@ -83,68 +98,67 @@
 
                         <tbody>
 
-                        <% if(users.length > 0){ %>
+                            <% if(users.length > 0){ %>
 
-                            <% users.forEach(user => { %>
+                                <% users.forEach(user => { %>
+
+                                    <tr>
+
+                                        <td><%= user.user_id %></td>
+
+                                        <td>
+                                            <strong><%= user.username %></strong>
+                                        </td>
+
+                                        <td><%= user.email %></td>
+
+                                        <td>
+
+                                            <% if(user.role === 'admin'){ %>
+
+                                                <span class="badge bg-danger">
+                                                    Admin
+                                                </span>
+
+                                            <% } else { %>
+
+                                                <span class="badge bg-secondary">
+                                                    User
+                                                </span>
+
+                                            <% } %>
+
+                                        </td>
+
+                                        <td><%= user.date_joined %></td>
+
+                                        <td class="text-center">
+
+                                            <a href="/admin/user/<%= user.user_id %>" class="btn btn-primary btn-sm">
+
+                                                View Collection
+
+                                            </a>
+
+                                        </td>
+
+                                    </tr>
+
+                                <% }) %>
+
+                            <% } else { %>
 
                                 <tr>
 
-                                    <td><%= user.user_id %></td>
+                                    <td colspan="6" class="text-center py-4">
 
-                                    <td>
-                                        <strong><%= user.username %></strong>
-                                    </td>
-
-                                    <td><%= user.email %></td>
-
-                                    <td>
-
-                                        <% if(user.role === 'admin'){ %>
-
-                                            <span class="badge bg-danger">
-                                                Admin
-                                            </span>
-
-                                        <% } else { %>
-
-                                            <span class="badge bg-secondary">
-                                                User
-                                            </span>
-
-                                        <% } %>
-
-                                    </td>
-
-                                    <td><%= user.date_joined %></td>
-
-                                    <td class="text-center">
-
-                                        <a href="/admin/user/<%= user.user_id %>"
-                                           class="btn btn-primary btn-sm">
-
-                                            View Collection
-
-                                        </a>
+                                        No registered users found.
 
                                     </td>
 
                                 </tr>
 
-                            <% }) %>
-
-                        <% } else { %>
-
-                            <tr>
-
-                                <td colspan="6" class="text-center py-4">
-
-                                    No registered users found.
-
-                                </td>
-
-                            </tr>
-
-                        <% } %>
+                            <% } %>
 
                         </tbody>
 
