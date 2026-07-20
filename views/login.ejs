@@ -1,40 +1,146 @@
-<%- include('partials/header', { title: 'Login - CardVault' }) %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardVault &mdash; Your vault awaits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { height: 100%; margin: 0; overflow: auto; }
+  body { background: #0a0c12; font-family: Archivo, system-ui, sans-serif; }
+  a { color: #cba65f; text-decoration: none; }
+  a:hover { color: #e0bf7c; }
+  input::placeholder { color: #5a6175; }
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field label {
+    font: 600 11px ui-monospace, Menlo, monospace;
+    letter-spacing: .2em; color: #8a90a4;
+  }
+  .field input {
+    padding: 14px 16px; background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.14); border-radius: 8px;
+    color: #f2ede1; font: 400 15px Archivo, sans-serif; outline: none;
+  }
+  .field input:focus { border-color: rgba(203,166,95,.7); }
+  .btn-submit {
+    margin-top: 6px; padding: 16px; width: 100%;
+    background: linear-gradient(180deg, #e0bf7c, #c9a35c);
+    color: #1c1508; font: 600 16px Archivo, sans-serif;
+    border: none; border-radius: 8px; cursor: pointer;
+    box-shadow: 0 8px 28px rgba(214,179,106,.25);
+  }
+  .btn-submit:hover { filter: brightness(1.06); }
+  .dial-num {
+    position: absolute; left: 50%; top: 50%;
+    font: 600 13px ui-monospace, Menlo, monospace;
+    color: rgba(203,166,95,.8);
+  }
+</style>
+</head>
+<body>
+<div style="position:relative;width:100%;min-height:100vh;overflow:hidden;background:radial-gradient(120% 100% at 50% 0%,#181d2e 0%,#0e1119 55%,#0a0c12 100%)">
+  <div style="position:absolute;inset:22px;border:1px solid rgba(203,166,95,.26);pointer-events:none;z-index:5"></div>
+  <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:110px;min-height:100vh;padding:48px;box-sizing:border-box">
 
-<%# Step 4b - Login form %>
-
-<div class="container mt-4">
-    <h1>Login</h1>
-
-    <% if (messages && messages.length > 0) { %>
-        <div class="alert alert-success">
-            <% messages.forEach(function(message) { %>
-                <p><%= message %></p>
-            <% }); %>
+    <!-- vault door dial -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:28px">
+      <div style="position:relative;width:360px;height:360px;display:flex;align-items:center;justify-content:center">
+        <div style="position:absolute;inset:0;border:1px solid rgba(203,166,95,.32);border-radius:50%"></div>
+        <div style="position:absolute;left:50%;top:-1px;width:2px;height:14px;background:#cba65f;transform:translateX(-50%);z-index:3"></div>
+        <div id="dial-ring" style="position:absolute;inset:26px;border-radius:50%;transition:transform .7s cubic-bezier(.22,1,.36,1)">
+          <span class="dial-num" style="transform:translate(-50%,-50%) rotate(0deg) translateY(-128px)">0</span>
+          <span class="dial-num" style="transform:translate(-50%,-50%) rotate(36deg) translateY(-128px)">10</span>
+          <span class="dial-num" style="transform:translate(-50%,-50%) rotate(72deg) translateY(-128px)">20</span>
+          <span class="dial-num" style="transform:translate(-50%,-50%) rotate(108deg) translateY(-128px)">30</span>
+          <span class="dial-num" style="transform:translate(-50%,-50%) rotate(144deg) translateY(-128px)">40</span>
+          <span class="dial-num" style="transform:translate(-50%,-50%) rotate(180deg) translateY(-128px)">50</span>
+          <span class="dial-num" style="transform:translate(-50%,-50%) rotate(216deg) translateY(-128px)">60</span>
+          <span class="dial-num" style="transform:translate(-50%,-50%) rotate(252deg) translateY(-128px)">70</span>
+          <span class="dial-num" style="transform:translate(-50%,-50%) rotate(288deg) translateY(-128px)">80</span>
+          <span class="dial-num" style="transform:translate(-50%,-50%) rotate(324deg) translateY(-128px)">90</span>
         </div>
-    <% } %>
-
-    <% if (errors && errors.length > 0) { %>
-        <div class="alert alert-danger">
-            <% errors.forEach(function(error) { %>
-                <p><%= error %></p>
-            <% }); %>
+        <div style="position:absolute;inset:56px;border:1px solid rgba(255,255,255,.1);border-radius:50%;transition:transform .7s cubic-bezier(.22,1,.36,1)" id="dial-inner"></div>
+        <div id="dial-core" style="position:relative;width:150px;height:150px;border-radius:50%;background:linear-gradient(160deg,#1c2236,#0d1017);border:1px solid rgba(203,166,95,.5);display:flex;align-items:center;justify-content:center;transition:box-shadow .7s ease;box-shadow:0 0 30px rgba(0,0,0,.6)">
+          <div style="width:58px;height:58px;border:1px solid rgba(203,166,95,.6);transform:rotate(45deg);display:flex;align-items:center;justify-content:center">
+            <span style="transform:rotate(-45deg);font:400 20px 'Instrument Serif',serif;color:#cba65f">CV</span>
+          </div>
         </div>
-    <% } %>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font:600 11px ui-monospace,Menlo,monospace;letter-spacing:.3em">
+        <span id="status-dot" style="width:5px;height:5px;border-radius:50%;background:#6d7488;transition:background .5s"></span>
+        <span id="status-text" style="color:#6d7488;transition:color .5s">VAULT SEALED</span>
+      </div>
+    </div>
 
-    <form action="/login" method="POST" class="mt-4">
-        <div class="form-group mb-3">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" class="form-control" required>
+    <!-- Step 4b - Login form -->
+    <div style="width:400px;display:flex;flex-direction:column;gap:20px">
+      <span style="font:600 11.5px ui-monospace,Menlo,monospace;letter-spacing:.3em;color:#cba65f">WELCOME BACK, COLLECTOR</span>
+      <h1 style="margin:0;font:400 46px/1.08 'Instrument Serif',serif;color:#f2ede1">Your vault awaits.</h1>
+
+      <% if (messages && messages.length > 0) { %>
+        <div style="padding:13px 16px;border:1px solid rgba(203,166,95,.45);background:rgba(214,179,106,.08);border-radius:8px;font:400 14px Archivo,sans-serif;color:#e0c993">
+          <%= messages[0] %>
         </div>
-
-        <div class="form-group mb-3">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" class="form-control" required>
+      <% } %>
+      <% if (errors && errors.length > 0) { %>
+        <div style="padding:13px 16px;border:1px solid rgba(224,120,120,.45);background:rgba(224,120,120,.08);border-radius:8px;font:400 14px Archivo,sans-serif;color:#e8a0a0">
+          <%= errors[0] %>
         </div>
+      <% } %>
 
-        <button type="submit" class="btn btn-primary">Login</button>
-    </form>
+      <form action="/login" method="POST" style="display:flex;flex-direction:column;gap:16px">
+        <div class="field">
+          <label for="email">EMAIL</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label for="password">PASSWORD</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn-submit">Unlock my vault</button>
+      </form>
+
+      <span style="font:400 14px Archivo,sans-serif;color:#8a90a4">New here? <a href="/register">Start your vault</a></span>
+    </div>
+  </div>
 </div>
 
+<script>
+  // 60 marker lines around the dial (long tick at each number)
+  var ring = document.getElementById('dial-ring');
+  for (var i = 0; i < 60; i++) {
+    var major = i % 6 === 0;
+    var tick = document.createElement('span');
+    tick.style.cssText =
+      'position:absolute;left:50%;top:50%;width:1.5px;height:' + (major ? 13 : 6) + 'px;' +
+      'background:rgba(203,166,95,' + (major ? 0.85 : 0.45) + ');' +
+      'transform:translate(-50%,-50%) rotate(' + (i * 6) + 'deg) translateY(-148px)';
+    ring.appendChild(tick);
+  }
 
-<%- include('partials/footer') %>
+  // Dial turns as fields are filled; core glows when ready
+  var emailInput = document.getElementById('email');
+  var passwordInput = document.getElementById('password');
+  var inner = document.getElementById('dial-inner');
+  var core = document.getElementById('dial-core');
+  var statusDot = document.getElementById('status-dot');
+  var statusText = document.getElementById('status-text');
+  function updateDial() {
+    var filled = (emailInput.value.trim() ? 1 : 0) + (passwordInput.value ? 1 : 0);
+    var ready = filled === 2;
+    ring.style.transform = 'rotate(' + (filled * 30) + 'deg)';
+    inner.style.transform = 'rotate(-' + (filled * 30) + 'deg)';
+    core.style.boxShadow = ready
+      ? '0 0 60px rgba(214,179,106,.45), 0 0 24px rgba(214,179,106,.3)'
+      : '0 0 30px rgba(0,0,0,.6)';
+    statusDot.style.background = ready ? '#cba65f' : '#6d7488';
+    statusText.style.color = ready ? '#cba65f' : '#6d7488';
+    statusText.textContent = ready ? 'READY TO UNLOCK' : 'VAULT SEALED';
+  }
+  emailInput.addEventListener('input', updateDial);
+  passwordInput.addEventListener('input', updateDial);
+  updateDial();
+</script>
+</body>
+</html>
