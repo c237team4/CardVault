@@ -202,6 +202,47 @@ app.post('/login', (req, res) => {
     });
 });
 
+// Step 5 GET /forgot-password
+
+app.get('/forgot-password', (req, res) => {
+    res.render('forgot-password', {
+        errors: req.flash('error')
+    });
+});
+
+
+// Step 6 POST /forgot-password
+
+app.post('/forgot-password', (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/forgot-password');
+    }
+
+    if (password.length < 6) {
+        req.flash('error', 'Password should be at least 6 or more characters long');
+        return res.redirect('/forgot-password');
+    }
+
+    const sql = 'UPDATE users SET password = SHA1(?) WHERE email = ?';
+    connection.query(sql, [password, email], (err, result) => {
+        if (err) {
+            console.error('Error resetting password:', err);
+            return res.status(500).send('Error resetting password');
+        }
+
+        if (result.affectedRows > 0) {
+            req.flash('success', 'Password reset! Please log in with your new password.');
+            res.redirect('/login');
+        } else {
+            req.flash('error', 'No account found with that email.');
+            res.redirect('/forgot-password');
+        }
+    });
+});
+
 
 
 // -----------------------------------------------------------------------------
