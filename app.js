@@ -222,7 +222,7 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
 
     const userId = req.session.user.user_id;
 
-    const sql = `
+    const cardSql = `
         SELECT cards.*,
                conditions.condition_name
         FROM cards
@@ -232,19 +232,37 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
         ORDER BY date_added DESC
     `;
 
-    connection.query(sql, [userId], (err, cards) => {
+    const categorySql = `
+        SELECT DISTINCT category
+        FROM cards
+        WHERE user_id = ?
+        ORDER BY category
+    `;
+
+    connection.query(categorySql, [userId], (err, categories) => {
+
         if (err) {
             console.error(err);
-            return res.status(500).send('Database error');
+            return res.status(500).send("Database error");
         }
 
-        res.render('dashboard', {
-            user: req.session.user,
-            cards: cards,
-            search: "",
-            categoryFilter: "",
-            categories: []
+        connection.query(cardSql, [userId], (err, cards) => {
+
+            if (err) {
+                console.error(err);
+                return res.status(500).send("Database error");
+            }
+
+            res.render("dashboard", {
+                user: req.session.user,
+                cards: cards,
+                categories: categories,
+                search: "",
+                categoryFilter: ""
+            });
+
         });
+
     });
 
 });
