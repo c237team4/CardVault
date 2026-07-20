@@ -533,6 +533,9 @@ app.post('/admin/edit-role/:id', checkAuthenticated, checkAdmin, (req, res) => {
 app.get('/admin/all-cards', checkAuthenticated, checkAdmin, (req, res) => {
 
     const search = req.query.search || "";
+    const category = req.query.category || "";
+    const rarity = req.query.rarity || "";
+
 
     const sql = `
         SELECT cards.*,
@@ -544,20 +547,61 @@ app.get('/admin/all-cards', checkAuthenticated, checkAdmin, (req, res) => {
         LEFT JOIN conditions
         ON cards.condition_id = conditions.condition_id
         WHERE cards.card_name LIKE ?
+        AND cards.category LIKE ?
+        AND cards.rarity LIKE ?
         ORDER BY cards.date_added DESC
     `;
 
 
-    connection.query(sql, [`%${search}%`], (err, cards) => {
+    const categorySql = `
+        SELECT DISTINCT category
+        FROM cards
+    `;
+
+
+    const raritySql = `
+        SELECT DISTINCT rarity
+        FROM cards
+    `;
+
+
+    connection.query(sql,
+    [
+        `%${search}%`,
+        `%${category}%`,
+        `%${rarity}%`
+    ],
+    (err, cards) => {
 
         if (err) throw err;
 
 
-        res.render('admin-all-cards', {
+        connection.query(categorySql, (err, categories) => {
 
-            user: req.session.user,
-            cards: cards,
-            search: search
+            if (err) throw err;
+
+
+            connection.query(raritySql, (err, rarities) => {
+
+                if (err) throw err;
+
+
+                res.render('admin-all-cards', {
+
+                    user: req.session.user,
+                    cards: cards,
+
+                    categories: categories,
+                    rarities: rarities,
+
+                    search: search,
+                    searchCategory: category,
+                    searchRarity: rarity
+
+                });
+
+
+            });
 
         });
 
