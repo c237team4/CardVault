@@ -386,56 +386,122 @@ app.get('/search', checkAuthenticated, (req, res) => {
 });
 
 // -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Admin Dashboard
 // View Admin Dashboard
+// -----------------------------------------------------------------------------
+
 app.get('/admin-dashboard', checkAuthenticated, checkAdmin, (req, res) => {
 
     // Total users
-    const totalUsersSql = "SELECT COUNT(*) AS totalUsers FROM users WHERE is_active = 1";
+    const totalUsersSql = `
+        SELECT COUNT(*) AS totalUsers
+        FROM users
+        WHERE is_active = 1
+    `;
+
 
     // Total cards
-    const totalCardsSql = "SELECT COUNT(*) AS totalCards FROM cards";
+    const totalCardsSql = `
+        SELECT COUNT(*) AS totalCards
+        FROM cards
+    `;
+
+
+    // Card category statistics
+    const categoryStatsSql = `
+        SELECT category,
+               COUNT(*) AS total
+        FROM cards
+        GROUP BY category
+        ORDER BY total DESC
+    `;
+
 
     // All registered users
     const usersSql = `
-        SELECT user_id, username, email, role, date_joined
+        SELECT user_id,
+               username,
+               email,
+               role,
+               date_joined
         FROM users
         WHERE is_active = 1
         ORDER BY username
     `;
 
+
+
     connection.query(totalUsersSql, (err, userCount) => {
+
         if (err) throw err;
 
+
         connection.query(totalCardsSql, (err, cardCount) => {
+
             if (err) throw err;
 
-            connection.query(usersSql, (err, users) => {
+
+            connection.query(categoryStatsSql, (err, categoryStats) => {
+
                 if (err) throw err;
 
-                res.render('admin-dashboard', {
-                    user: req.session.user,
-                    totalUsers: userCount[0].totalUsers,
-                    totalCards: cardCount[0].totalCards,
-                    users: users
+
+                connection.query(usersSql, (err, users) => {
+
+                    if (err) throw err;
+
+
+
+                    res.render('admin-dashboard', {
+
+                        user: req.session.user,
+
+                        totalUsers: userCount[0].totalUsers,
+
+                        totalCards: cardCount[0].totalCards,
+
+                        categoryStats: categoryStats,
+
+                        users: users
+
+                    });
+
+
+
                 });
+
+
             });
+
+
         });
+
+
     });
+
 
 });
 
 
+
+// -----------------------------------------------------------------------------
 // View one user's collection
+// -----------------------------------------------------------------------------
+
 app.get('/admin/user/:id', checkAuthenticated, checkAdmin, (req, res) => {
 
     const userId = req.params.id;
 
+
     const userSql = `
-        SELECT user_id, username, email
+        SELECT user_id,
+               username,
+               email
         FROM users
         WHERE user_id = ?
     `;
+
 
     const cardsSql = `
         SELECT cards.*,
@@ -444,28 +510,276 @@ app.get('/admin/user/:id', checkAuthenticated, checkAdmin, (req, res) => {
         LEFT JOIN conditions
         ON cards.condition_id = conditions.condition_id
         WHERE cards.user_id = ?
-        ORDER BY date_added DESC
+        ORDER BY cards.created_at DESC
     `;
 
+
+
     connection.query(userSql, [userId], (err, userResult) => {
+
         if (err) throw err;
 
+
         if (userResult.length === 0) {
+
             return res.send("User not found.");
+
         }
 
+
+
         connection.query(cardsSql, [userId], (err, cards) => {
+
             if (err) throw err;
 
+
+
             res.render('admin-view-collection', {
+
                 user: req.session.user,
+
                 selectedUser: userResult[0],
+
                 cards: cards
+
             });
+
+
 
         });
 
+
+
     });
+
+
+
+});
+
+
+
+// -----------------------------------------------------------------------------
+// Edit Role Page
+// -----------------------------------------------------------------------------
+
+app.get('/admin/edit-role/:id', checkAuthenticated, checkAdmin, (req, res) => {
+
+    const userId = req.params.id;
+
+
+    const sql = `
+        SELECT user_id,
+               username,
+               email,
+               role
+        FROM users
+        WHERE user_id = ?
+    `;
+
+
+    connection.query(sql, [userId], (err, result) => {
+
+
+        if (err) throw err;
+
+
+        if (result.length === 0) {
+
+            return res.send("User not found.");
+
+        }
+
+
+
+        res.render('admin-edit-role', {
+
+            user: req.session.user,
+
+            selectedUser: result[0]
+
+        });
+
+
+
+    });
+
+
+});
+
+
+
+// -----------------------------------------------------------------------------
+// Update User Role
+// -----------------------------------------------------------------------------
+
+app.post('/admin/edit-role/:id', checkAuthenticated, checkAdmin, (req, res) => {
+
+
+    const userId = req.params.id;
+
+    const role = req.body.role;
+
+
+
+    const sql = `
+        UPDATE users
+        SET role = ?
+        WHERE user_id = ?
+    `;
+
+
+
+    connection.query(sql, [role, userId], (err) => {
+
+
+        if (err) throw err;
+
+
+        res.redirect('/admin-dashboard');
+
+
+    });
+
+
+
+});
+
+
+
+// -----------------------------------------------------------------------------
+// View All Cards (Admin)
+// -----------------------------------------------------------------------------
+
+app.get('/admin/all-cards', checkAuthenticated, checkAdmin, (req, res) => {
+
+
+    const search = req.query.search || "";
+
+    const category = req.query.category || "";
+
+    const rarity = req.query.rarity || "";
+
+
+
+    let sql = `
+        SELECT cards.*,
+               users.username,
+               conditions.condition_name
+        FROM cards
+        LEFT JOIN users
+        ON cards.user_id = users.user_id
+        LEFT JOIN conditions
+        ON cards.condition_id = conditions.condition_id
+        WHERE cards.card_name LIKE ?
+    `;
+
+
+
+    let values = [
+
+        `%${search}%`
+
+    ];
+
+
+
+    if(category){
+
+        sql += " AND cards.category = ?";
+
+        values.push(category);
+
+    }
+
+
+
+    if(rarity){
+
+        sql += " AND cards.rarity = ?";
+
+        values.push(rarity);
+
+    }
+
+
+
+    sql += " ORDER BY cards.created_at DESC";
+
+
+
+
+    const categorySql = `
+        SELECT DISTINCT category
+        FROM cards
+        ORDER BY category
+    `;
+
+
+
+    const raritySql = `
+        SELECT DISTINCT rarity
+        FROM cards
+        ORDER BY rarity
+    `;
+
+
+
+
+    connection.query(sql, values, (err, cards) => {
+
+
+        if(err) throw err;
+
+
+
+        connection.query(categorySql, (err, categories) => {
+
+
+            if(err) throw err;
+
+
+
+            connection.query(raritySql, (err, rarities) => {
+
+
+                if(err) throw err;
+
+
+
+                res.render('admin-all-cards', {
+
+
+                    user: req.session.user,
+
+                    cards: cards,
+
+                    categories: categories,
+
+                    rarities: rarities,
+
+
+                    search: search,
+
+                    searchCategory: category,
+
+                    searchRarity: rarity
+
+
+                });
+
+
+
+            });
+
+
+
+        });
+
+
+
+    });
+
+
 
 });
 // -----------------------------------------------------------------------------
