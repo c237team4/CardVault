@@ -22,16 +22,12 @@
 
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav me-auto">
-        <% if (typeof user !== 'undefined' && user) { %>
-          <% if (user.role === 'admin') { %>
-            <li class="nav-item"><a class="nav-link" href="/admin-dashboard">Admin Dashboard</a></li>
-          <% } else { %>
-            <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link" href="/view-collection">My Collection</a></li>
-            <li class="nav-item"><a class="nav-link" href="/add-card">Add Card</a></li>
+        <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin-dashboard">Admin Dashboard</a>
+          </li>
           <% } %>
-        <% } %>
-      </ul>
+        </ul>
 
       <ul class="navbar-nav">
         <% if (typeof user !== 'undefined' && user) { %>
