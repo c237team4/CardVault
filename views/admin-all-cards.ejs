@@ -4,7 +4,9 @@
 
     <div class="container">
 
+
         <!-- Page Header -->
+
         <div class="d-flex justify-content-between align-items-center mb-5">
 
             <div>
@@ -29,17 +31,23 @@
         </div>
 
 
+
+
         <!-- Search and Filter -->
+
         <div class="card shadow border-0 mb-4">
 
             <div class="card-body">
 
+
                 <form method="GET" action="/admin/all-cards">
+
 
                     <div class="row g-3">
 
 
                         <!-- Search -->
+
                         <div class="col-md-5">
 
                             <input type="text"
@@ -51,68 +59,99 @@
                         </div>
 
 
+
+
                         <!-- Category -->
+
                         <div class="col-md-3">
 
                             <select name="category" class="form-select">
 
+
                                 <option value="">
+
                                     All Categories
+
                                 </option>
+
 
 
                                 <% categories.forEach(category => { %>
 
+
                                     <option value="<%= category.category %>"
                                         <%= searchCategory === category.category ? 'selected' : '' %>>
 
+
                                         <%= category.category %>
 
+
                                     </option>
+
 
                                 <% }) %>
 
 
                             </select>
 
+
                         </div>
 
 
+
+
+
                         <!-- Rarity -->
+
                         <div class="col-md-3">
 
                             <select name="rarity" class="form-select">
 
+
                                 <option value="">
+
                                     All Rarities
+
                                 </option>
+
 
 
                                 <% rarities.forEach(rarity => { %>
 
+
                                     <option value="<%= rarity.rarity %>"
                                         <%= searchRarity === rarity.rarity ? 'selected' : '' %>>
 
+
                                         <%= rarity.rarity %>
 
+
                                     </option>
+
 
                                 <% }) %>
 
 
                             </select>
 
+
                         </div>
 
 
+
+
+
                         <!-- Search Button -->
+
                         <div class="col-md-1">
+
 
                             <button class="btn btn-primary w-100">
 
                                 Search
 
                             </button>
+
 
                         </div>
 
@@ -125,47 +164,74 @@
 
             </div>
 
+
         </div>
 
 
 
+
+
         <!-- Card Grid -->
+
         <div class="row g-4">
+
 
 
             <% if(cards.length > 0){ %>
 
 
+
                 <% cards.forEach(card => { %>
+
 
 
                     <div class="col-md-4 col-lg-3">
 
 
-                        <div class="card shadow border-0 h-100">
+
+                        <div class="card shadow border-0 h-100 rounded-4 overflow-hidden">
+
+
+
 
 
                             <!-- Card Image -->
+
+
                             <% if(card.image){ %>
+
 
                                 <img src="/images/<%= card.image %>"
                                      class="card-img-top"
                                      style="height:220px; object-fit:contain;">
 
+
+
                             <% } else { %>
+
+
 
                                 <div class="d-flex justify-content-center align-items-center bg-light"
                                      style="height:220px;">
 
+
                                     No Image
 
+
                                 </div>
+
+
 
                             <% } %>
 
 
 
+
+
+
                             <!-- Card Details -->
+
+
                             <div class="card-body">
 
 
@@ -176,62 +242,153 @@
                                 </h5>
 
 
-                                <p class="mb-1">
+
+
+
+                                <!-- Owner -->
+
+
+                                <p class="mb-3">
 
                                     <strong>Owner:</strong>
+
                                     <%= card.username %>
 
                                 </p>
 
 
-                                <p class="mb-1">
-
-                                    <strong>Category:</strong>
-                                    <%= card.category %>
-
-                                </p>
 
 
-                                <p class="mb-1">
-
-                                    <strong>Rarity:</strong>
-                                    <%= card.rarity %>
-
-                                </p>
 
 
-                                <p class="mb-1">
-
-                                    <strong>Condition:</strong>
-                                    <%= card.condition_name %>
-
-                                </p>
+                                <!-- Category -->
 
 
-                                <p class="mb-0">
+                                <div class="mb-2">
 
-                                    <strong>Value:</strong>
-                                    $<%= card.estimated_value %>
 
-                                </p>
+                                    <span class="badge bg-primary">
+
+                                        Category
+
+                                    </span>
+
+
+                                    <span class="badge bg-primary ms-1">
+
+                                        <%= card.category %>
+
+                                    </span>
+
+
+                                </div>
+
+
+
+
+
+
+                                <!-- Rarity -->
+
+
+                                <div class="mb-2">
+
+
+                                    <span class="badge bg-danger">
+
+                                        Rarity
+
+                                    </span>
+
+
+                                    <span class="badge bg-danger ms-1">
+
+                                        <%= card.rarity %>
+
+                                    </span>
+
+
+                                </div>
+
+
+
+
+
+
+                                <!-- Condition -->
+
+
+                                <div class="mb-2">
+
+
+                                    <span class="badge bg-success">
+
+                                        Condition
+
+                                    </span>
+
+
+                                    <span class="badge bg-success ms-1">
+
+                                        <%= card.condition_name %>
+
+                                    </span>
+
+
+                                </div>
+
+
+
+
+
+
+                                <!-- Value -->
+
+
+                                <div class="mb-0">
+
+
+                                    <span class="badge bg-info">
+
+                                        Value
+
+                                    </span>
+
+
+                                    <span class="badge bg-info ms-1">
+
+                                        $<%= card.estimated_value %>
+
+                                    </span>
+
+
+                                </div>
+
 
 
                             </div>
 
 
+
                         </div>
+
 
 
                     </div>
 
 
+
                 <% }) %>
+
 
 
             <% } else { %>
 
 
+
+
                 <div class="text-center py-5">
+
 
                     <h5 class="text-muted">
 
@@ -239,13 +396,18 @@
 
                     </h5>
 
+
                 </div>
+
 
 
             <% } %>
 
 
+
+
         </div>
+
 
 
     </div>
