@@ -1,0 +1,288 @@
+<%- include('partials/header', { title: 'Card Details - CardVault' }) %>
+
+
+<div class="bg-light min-vh-100 py-5">
+
+    <div class="container">
+
+
+        <!-- Header -->
+
+        <div class="d-flex justify-content-between align-items-center mb-5">
+
+            <div>
+
+                <h1 class="fw-bold">
+                    Card Details
+                </h1>
+
+                <p class="text-muted">
+                    View complete information about this card.
+                </p>
+
+            </div>
+
+
+            <a href="/admin/all-cards" class="btn btn-secondary rounded-pill px-4">
+
+                Back to All Cards
+
+            </a>
+
+        </div>
+
+
+
+
+
+        <!-- Card Details -->
+
+        <div class="card shadow border-0 rounded-4 overflow-hidden">
+
+
+            <div class="row g-0">
+
+
+
+                <!-- Image Section -->
+
+                <div class="col-md-5 bg-white d-flex align-items-center justify-content-center p-5">
+
+
+                    <% if(card.image){ %>
+
+
+                        <img src="/images/<%= card.image %>"
+                             class="img-fluid rounded-4 shadow-sm"
+                             style="height:380px; object-fit:contain;">
+
+
+                    <% } else { %>
+
+
+                        <div class="text-muted">
+
+                            No Image Available
+
+                        </div>
+
+
+                    <% } %>
+
+
+                </div>
+
+
+
+
+
+
+                <!-- Information Section -->
+
+                <div class="col-md-7">
+
+
+                    <div class="card-body p-5">
+
+
+
+                        <h2 class="fw-bold mb-4">
+
+                            <%= card.card_name %>
+
+                        </h2>
+
+
+
+
+
+                        <!-- Owner -->
+
+                        <div class="mb-3">
+
+                            <span class="fw-bold">
+                                Owner:
+                            </span>
+
+                            <span class="text-muted">
+                                <%= card.username %>
+                            </span>
+
+                        </div>
+
+
+
+
+
+
+                        <!-- Category -->
+
+                        <div class="mb-3">
+
+                            <span class="badge bg-primary px-3 py-2">
+
+                                Category
+
+                            </span>
+
+
+                            <span class="badge bg-primary px-3 py-2 ms-2">
+
+                                <%= card.category %>
+
+                            </span>
+
+
+                        </div>
+
+
+
+
+
+
+                        <!-- Rarity -->
+
+                        <div class="mb-3">
+
+                            <span class="badge bg-danger px-3 py-2">
+
+                                Rarity
+
+                            </span>
+
+
+                            <span class="badge bg-danger px-3 py-2 ms-2">
+
+                                <%= card.rarity %>
+
+                            </span>
+
+
+                        </div>
+
+
+
+
+
+
+                        <!-- Condition -->
+
+                        <div class="mb-3">
+
+                            <span class="badge bg-success px-3 py-2">
+
+                                Condition
+
+                            </span>
+
+
+                            <span class="badge bg-success px-3 py-2 ms-2">
+
+                                <%= card.condition_name %>
+
+                            </span>
+
+
+                        </div>
+
+
+
+
+
+
+                        <!-- Value -->
+
+                        <div class="mb-3">
+
+                            <span class="badge bg-info px-3 py-2">
+
+                                Value
+
+                            </span>
+
+
+                            <span class="badge bg-info px-3 py-2 ms-2">
+
+                                $<%= card.estimated_value %>
+
+                            </span>
+
+
+                        </div>
+
+
+
+
+
+
+                        <!-- Quantity -->
+
+                        <div class="mb-3">
+
+                            <span class="fw-bold">
+
+                                Quantity:
+
+                            </span>
+
+
+                            <span class="text-muted">
+
+                                <%= card.quantity %>
+
+                            </span>
+
+
+                        </div>
+
+
+
+
+
+
+                        <!-- Remarks -->
+
+                        <div class="mt-4">
+
+
+                            <h5 class="fw-bold">
+
+                                Remarks
+
+                            </h5>
+
+
+                            <div class="bg-light rounded-3 p-3 text-muted">
+
+                                <%= card.remarks || 'No remarks added.' %>
+
+                            </div>
+
+
+                        </div>
+
+
+
+
+                    </div>
+
+
+                </div>
+
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+    </div>
+
+
+</div>
+
+
+<%- include('partials/footer') %>
