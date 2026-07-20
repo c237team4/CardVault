@@ -609,6 +609,56 @@ app.get('/admin/all-cards', checkAuthenticated, checkAdmin, (req, res) => {
     });
 
 });
+
+// View Card Details (Admin)
+app.get('/admin/card/:id', checkAuthenticated, checkAdmin, (req, res) => {
+
+    const cardId = req.params.id;
+
+
+    const sql = `
+        SELECT cards.*,
+               users.username,
+               conditions.condition_name
+        FROM cards
+        LEFT JOIN users
+        ON cards.user_id = users.user_id
+        LEFT JOIN conditions
+        ON cards.condition_id = conditions.condition_id
+        WHERE cards.card_id = ?
+    `;
+
+
+    connection.query(sql, [cardId], (err, results) => {
+
+
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Database error");
+        }
+
+
+
+        if (results.length === 0) {
+
+            return res.status(404).send("Card not found");
+
+        }
+
+
+
+        res.render('admin-view-card', {
+
+            user: req.session.user,
+            card: results[0]
+
+        });
+
+
+    });
+
+
+});
 // -----------------------------------------------------------------------------
 
 // =============================================================================
