@@ -164,14 +164,14 @@ Open `app.js` and scroll to the `ROUTES` section. It's split into six labelled b
 
 Your view files have the same header, with notes on what the route passes you and what the form needs. Read them before you start — they will save you an hour.
 
-| Block       | Owner     | Responsibility                                     | Views you own                              |
-| ----------- | --------- | -------------------------------------------------- | ------------------------------------------ |
-| **A** | Boon Meng | Registration, Login, Access Control                | `login.ejs`, `register.ejs`            |
-| **B** | Ryan      | Adding a card                                      | `add-card.ejs`                           |
-| **C** | Sammi     | Dashboard + viewing cards                          | `dashboard.ejs`, `view-collection.ejs` |
-| **D** | Ezann     | Editing a card                                     | `edit-card.ejs`                          |
-| **E** | Rainie    | Deleting cards + admin (users, genres, conditions) | `admin-dashboard.ejs`                    |
-| **F** | Zhan Fung | Search / filter / sort your own collection         | `view-collection.ejs` (shared with C)    |
+| Block       | Owner     | Responsibility                             | Views you own                                              |
+| ----------- | --------- | ------------------------------------------ | ---------------------------------------------------------- |
+| **A** | Boon Meng | Registration, Login, Access Control        | `login.ejs`, `login.ejs`, `register.ejs`            |
+| **B** | Ryan      | Adding a card                              | `add-card.ejs`                                           |
+| **C** | Sammi     | Viewing cards                              | `dashboard.ejs, view-card.ejs`                           |
+| **D** | Ezann     | Editing a card                             | `edit-card.ejs`                                          |
+| **E** | Rainie    | Deleting cards                             | `dashboard.ejs`                                          |
+| **F** | Zhan Fung | Search / filter / sort your own collection | `admin-dashboard.ejs`<br />`admin-view-collection.ejs` |
 
 **Why this matters:** Git merges cleanly when people change *different lines*. It gets confused when two people change the *same* lines. Staying inside your own block means you can all work at the same time without fighting.
 
