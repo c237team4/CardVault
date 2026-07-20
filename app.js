@@ -283,8 +283,6 @@ app.get('/card/:id', checkAuthenticated, (req, res) => {
 
 });
 
-
-
 // -----------------------------------------------------------------------------
 // STUDENT D  |  Owner: Ezann
 // Editing Existing Information
