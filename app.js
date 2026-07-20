@@ -240,7 +240,10 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
 
         res.render('dashboard', {
             user: req.session.user,
-            cards: cards
+            cards: cards,
+            search: "",
+            categoryFilter: "",
+            categories: []
         });
     });
 
@@ -306,7 +309,63 @@ app.get('/card/:id', checkAuthenticated, (req, res) => {
 // Searching, Filtering and Organising -- over the user's OWN collection
 //
 // -----------------------------------------------------------------------------
+app.get('/search', checkAuthenticated, (req, res) => {
 
+    const userId = req.session.user.user_id;
+
+    const search = req.query.search || "";
+    const category = req.query.category || "";
+
+    const categorySql = `
+        SELECT DISTINCT category
+        FROM cards
+        WHERE user_id = ?
+        ORDER BY category
+    `;
+
+    const sql = `
+        SELECT cards.*,
+               conditions.condition_name
+        FROM cards
+        LEFT JOIN conditions
+        ON cards.condition_id = conditions.condition_id
+        WHERE cards.user_id = ?
+        AND cards.card_name LIKE ?
+        AND cards.category LIKE ?
+        ORDER BY date_added DESC
+    `;
+
+    connection.query(categorySql, [userId], (err, categories) => {
+
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Database error");
+        }
+
+        connection.query(
+            sql,
+            [userId, "%" + search + "%", "%" + category + "%"],
+            (err, cards) => {
+
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send("Database error");
+                }
+
+                res.render("dashboard", {
+                    user: req.session.user,
+                    cards: cards,
+                    categories: categories,
+                    search: search,
+                    categoryFilter: category
+                });
+
+            }
+        );
+
+    });
+
+});
 
 // -----------------------------------------------------------------------------
 // Admin Dashboard
