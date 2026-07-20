@@ -1,6 +1,93 @@
-<%- include('partials/header', { title: 'Dashboard - CardVault' }) %>
+<%- include('partials/header', { title: 'My Collection - CardVault' }) %>
 
+<div class="bg-light min-vh-100 py-5">
 
+    <div class="container">
 
+        <!-- Page Title -->
+        <div class="text-center mb-5">
+
+            <h1 class="fw-bold">Card Collection</h1>
+
+            <p class="text-muted">
+                View your personal card collection.
+            </p>
+
+        </div>
+
+        <% if(cards.length > 0){ %>
+
+            <div class="row g-4">
+
+                <% cards.forEach(card => { %>
+
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="card shadow-sm h-100 border">
+
+                            <!-- Card Image -->
+                            <div class="text-center pt-4">
+
+                                <img src="/images/<%= card.image %>"
+                                     alt="<%= card.card_name %>"
+                                     style="height:280px; object-fit:contain; max-width:100%;">
+
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="card-body d-flex flex-column">
+
+                                <h2 class="text-center fw-bold mb-4">
+                                    <%= card.card_name %>
+                                </h2>
+
+                                <hr>
+
+                                <div class="mt-auto">
+
+                                    <div class="d-grid">
+
+                                        <a href="/card/<%= card.card_id %>"
+                                           class="btn btn-dark">
+
+                                            View Details
+
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                <% }) %>
+
+            </div>
+
+        <% } else { %>
+
+            <div class="card shadow border-0">
+
+                <div class="card-body text-center py-5">
+
+                    <h4>No cards found.</h4>
+
+                    <p class="text-muted">
+                        Start building your collection by adding your first card.
+                    </p>
+
+                </div>
+
+            </div>
+
+        <% } %>
+
+    </div>
+
+</div>
 
 <%- include('partials/footer') %>

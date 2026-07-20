@@ -217,7 +217,71 @@ app.post('/login', (req, res) => {
 // STUDENT C  |  Owner: Sammi
 // Viewing and Displaying Information
 // -----------------------------------------------------------------------------
+// View logged-in user's collection
+app.get('/dashboard', checkAuthenticated, (req, res) => {
 
+    const userId = req.session.user.user_id;
+
+    const sql = `
+        SELECT cards.*,
+               conditions.condition_name
+        FROM cards
+        LEFT JOIN conditions
+        ON cards.condition_id = conditions.condition_id
+        WHERE cards.user_id = ?
+        ORDER BY date_added DESC
+    `;
+
+    connection.query(sql, [userId], (err, cards) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        }
+
+        res.render('dashboard', {
+            user: req.session.user,
+            cards: cards
+        });
+    });
+
+});
+
+
+// View one card
+app.get('/card/:id', checkAuthenticated, (req, res) => {
+
+    const cardId = req.params.id;
+    const userId = req.session.user.user_id;
+
+    const sql = `
+        SELECT cards.*,
+               conditions.condition_name
+        FROM cards
+        LEFT JOIN conditions
+        ON cards.condition_id = conditions.condition_id
+        WHERE cards.card_id = ?
+        AND cards.user_id = ?
+    `;
+
+    connection.query(sql, [cardId, userId], (err, results) => {
+
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send('Card not found');
+        }
+
+        res.render('view-card', {
+            user: req.session.user,
+            card: results[0]
+        });
+
+    });
+
+});
 
 
 
