@@ -532,6 +532,8 @@ app.post('/admin/edit-role/:id', checkAuthenticated, checkAdmin, (req, res) => {
 // View All Cards (Admin)
 app.get('/admin/all-cards', checkAuthenticated, checkAdmin, (req, res) => {
 
+    const search = req.query.search || "";
+
     const sql = `
         SELECT cards.*,
                users.username,
@@ -541,11 +543,12 @@ app.get('/admin/all-cards', checkAuthenticated, checkAdmin, (req, res) => {
         ON cards.user_id = users.user_id
         LEFT JOIN conditions
         ON cards.condition_id = conditions.condition_id
+        WHERE cards.card_name LIKE ?
         ORDER BY cards.date_added DESC
     `;
 
 
-    connection.query(sql, (err, cards) => {
+    connection.query(sql, [`%${search}%`], (err, cards) => {
 
         if (err) throw err;
 
@@ -553,7 +556,8 @@ app.get('/admin/all-cards', checkAuthenticated, checkAdmin, (req, res) => {
         res.render('admin-all-cards', {
 
             user: req.session.user,
-            cards: cards
+            cards: cards,
+            search: search
 
         });
 
