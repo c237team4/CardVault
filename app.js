@@ -202,6 +202,47 @@ app.post('/login', (req, res) => {
     });
 });
 
+// Step 5 GET /forgot-password
+
+app.get('/forgot-password', (req, res) => {
+    res.render('forgot-password', {
+        errors: req.flash('error')
+    });
+});
+
+
+// Step 6 POST /forgot-password
+
+app.post('/forgot-password', (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/forgot-password');
+    }
+
+    if (password.length < 6) {
+        req.flash('error', 'Password should be at least 6 or more characters long');
+        return res.redirect('/forgot-password');
+    }
+
+    const sql = 'UPDATE users SET password = SHA1(?) WHERE email = ?';
+    connection.query(sql, [password, email], (err, result) => {
+        if (err) {
+            console.error('Error resetting password:', err);
+            return res.status(500).send('Error resetting password');
+        }
+
+        if (result.affectedRows > 0) {
+            req.flash('success', 'Password reset! Please log in with your new password.');
+            res.redirect('/login');
+        } else {
+            req.flash('error', 'No account found with that email.');
+            res.redirect('/forgot-password');
+        }
+    });
+});
+
 
 
 // -----------------------------------------------------------------------------
@@ -508,6 +549,197 @@ app.get('/admin/user/:id', checkAuthenticated, checkAdmin, (req, res) => {
         });
 
     });
+
+});
+
+// View Edit Role Page
+app.get('/admin/edit-role/:id', checkAuthenticated, checkAdmin, (req, res) => {
+
+    const userId = req.params.id;
+
+    const sql = `
+        SELECT user_id, username, email, role
+        FROM users
+        WHERE user_id = ?
+    `;
+
+    connection.query(sql, [userId], (err, result) => {
+
+        if (err) throw err;
+
+
+        if (result.length === 0) {
+
+            return res.send("User not found.");
+
+        }
+
+
+        res.render('admin-edit-role', {
+
+            user: req.session.user,
+            selectedUser: result[0]
+
+        });
+
+
+    });
+
+});
+
+// Update User Role
+app.post('/admin/edit-role/:id', checkAuthenticated, checkAdmin, (req, res) => {
+
+    const userId = req.params.id;
+    const role = req.body.role;
+
+
+    const sql = `
+        UPDATE users
+        SET role = ?
+        WHERE user_id = ?
+    `;
+
+
+    connection.query(sql, [role, userId], (err, result) => {
+
+        if (err) throw err;
+
+
+        res.redirect('/admin-dashboard');
+
+    });
+
+});
+
+// View All Cards (Admin)
+app.get('/admin/all-cards', checkAuthenticated, checkAdmin, (req, res) => {
+
+    const search = req.query.search || "";
+    const category = req.query.category || "";
+    const rarity = req.query.rarity || "";
+
+
+    const sql = `
+        SELECT cards.*,
+               users.username,
+               conditions.condition_name
+        FROM cards
+        LEFT JOIN users
+        ON cards.user_id = users.user_id
+        LEFT JOIN conditions
+        ON cards.condition_id = conditions.condition_id
+        WHERE cards.card_name LIKE ?
+        AND cards.category LIKE ?
+        AND cards.rarity LIKE ?
+        ORDER BY cards.date_added DESC
+    `;
+
+
+    const categorySql = `
+        SELECT DISTINCT category
+        FROM cards
+    `;
+
+
+    const raritySql = `
+        SELECT DISTINCT rarity
+        FROM cards
+    `;
+
+
+    connection.query(sql,
+    [
+        `%${search}%`,
+        `%${category}%`,
+        `%${rarity}%`
+    ],
+    (err, cards) => {
+
+        if (err) throw err;
+
+
+        connection.query(categorySql, (err, categories) => {
+
+            if (err) throw err;
+
+
+            connection.query(raritySql, (err, rarities) => {
+
+                if (err) throw err;
+
+
+                res.render('admin-all-cards', {
+
+                    user: req.session.user,
+                    cards: cards,
+
+                    categories: categories,
+                    rarities: rarities,
+
+                    search: search,
+                    searchCategory: category,
+                    searchRarity: rarity
+
+                });
+
+
+            });
+
+        });
+
+
+    });
+
+});
+
+// View Card Details (Admin)
+app.get('/admin/card/:id', checkAuthenticated, checkAdmin, (req, res) => {
+
+    const cardId = req.params.id;
+
+
+    const sql = `
+        SELECT cards.*,
+               users.username,
+               conditions.condition_name
+        FROM cards
+        LEFT JOIN users
+        ON cards.user_id = users.user_id
+        LEFT JOIN conditions
+        ON cards.condition_id = conditions.condition_id
+        WHERE cards.card_id = ?
+    `;
+
+
+    connection.query(sql, [cardId], (err, results) => {
+
+
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Database error");
+        }
+
+
+
+        if (results.length === 0) {
+
+            return res.status(404).send("Card not found");
+
+        }
+
+
+
+        res.render('admin-view-card', {
+
+            user: req.session.user,
+            card: results[0]
+
+        });
+
+
+    });
+
 
 });
 // -----------------------------------------------------------------------------

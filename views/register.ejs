@@ -1,43 +1,133 @@
-<%- include('partials/header', { title: 'Register - CardVault' }) %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardVault &mdash; Claim your collector's card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { height: 100%; margin: 0; overflow: auto; }
+  body { background: #0a0c12; font-family: Archivo, system-ui, sans-serif; }
+  a { color: #cba65f; text-decoration: none; }
+  a:hover { color: #e0bf7c; }
+  input::placeholder { color: #5a6175; }
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field label {
+    font: 600 11px ui-monospace, Menlo, monospace;
+    letter-spacing: .2em; color: #8a90a4;
+  }
+  .field input {
+    padding: 14px 16px; background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.14); border-radius: 8px;
+    color: #f2ede1; font: 400 15px Archivo, sans-serif; outline: none;
+  }
+  .field input:focus { border-color: rgba(203,166,95,.7); }
+  .btn-submit {
+    margin-top: 6px; padding: 16px; width: 100%;
+    background: linear-gradient(180deg, #e0bf7c, #c9a35c);
+    color: #1c1508; font: 600 16px Archivo, sans-serif;
+    border: none; border-radius: 8px; cursor: pointer;
+    box-shadow: 0 8px 28px rgba(214,179,106,.25);
+  }
+  .btn-submit:hover { filter: brightness(1.06); }
+</style>
+</head>
+<body>
+<div style="position:relative;width:100%;min-height:100vh;overflow:hidden;background:radial-gradient(120% 100% at 50% 0%,#181d2e 0%,#0e1119 55%,#0a0c12 100%)">
+  <div style="position:absolute;inset:22px;border:1px solid rgba(203,166,95,.26);pointer-events:none;z-index:5"></div>
+  <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:96px;min-height:100vh;padding:48px;box-sizing:border-box">
 
-<div class="container mt-4">
-    <h1>Register</h1>
-
-    <%# Step 2b - Show error message %>
-
-    <% if (messages && messages.length > 0) { %>
-        <div class="alert alert-danger">
-            <% messages.forEach(function(message) { %>
-                <p><%= message %></p>
-            <% }); %>
+    <!-- collector's card preview -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:22px">
+      <div style="position:relative;width:310px;height:435px;transform:rotate(-4deg);border-radius:16px;border:1px solid rgba(203,166,95,.5);background:linear-gradient(160deg,#1c2236 0%,#11141e 55%,#0d1017 100%);box-shadow:0 30px 70px rgba(0,0,0,.7),0 0 50px rgba(214,179,106,.14);overflow:hidden">
+        <div style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.07) 46%,transparent 60%)"></div>
+        <div style="position:absolute;inset:10px;border:1px solid rgba(203,166,95,.28);border-radius:10px;pointer-events:none"></div>
+        <div style="position:relative;display:flex;flex-direction:column;justify-content:space-between;height:100%;padding:28px;box-sizing:border-box">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font:600 11px Archivo,sans-serif;letter-spacing:.34em;color:#cba65f">CARDVAULT</span>
+            <span style="font:400 8.5px ui-monospace,Menlo,monospace;letter-spacing:.18em;color:#6d7488">COLLECTOR SERIES</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:20px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+              <span id="card-name" style="font:400 30px/1.1 'Instrument Serif',serif;color:#f2ede1;text-align:center;max-width:240px">Your Name</span>
+              <span style="font:600 9.5px Archivo,sans-serif;letter-spacing:.4em;color:#8a90a4">COLLECTOR</span>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font:400 10px ui-monospace,Menlo,monospace;letter-spacing:.14em;color:#6d7488">
+            <span id="member-since">MEMBER SINCE</span>
+          </div>
         </div>
-    <% } %>
+      </div>
+      <span style="font:400 12.5px Archivo,sans-serif;color:#6d7488">Your collector's card &mdash; minted the moment you sign up.</span>
+    </div>
+
+    <!-- registration form -->
+    <div style="width:400px;display:flex;flex-direction:column;gap:20px">
+      <span style="font:600 11.5px ui-monospace,Menlo,monospace;letter-spacing:.3em;color:#cba65f">OPEN A NEW VAULT</span>
+      <h1 style="margin:0;font:400 46px/1.08 'Instrument Serif',serif;color:#f2ede1">Claim your collector's card.</h1>
 
 
-    <%# Step 2a - Registration form creation with sticky re-fill %>
 
 
-    <form action="/register" method="POST" class="mt-4">
-        <div class="form-group mb-3">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" class="form-control" required
-                <% if (formData && formData.username) { %> value="<%= formData.username %>" <% } else { %> value="" <% } %>>
+      <%# Step 2b - Show error message %>
+
+
+      <% if (messages && messages.length > 0) { %>
+        <div style="padding:13px 16px;border:1px solid rgba(224,120,120,.45);background:rgba(224,120,120,.08);border-radius:8px;font:400 14px Archivo,sans-serif;color:#e8a0a0">
+          <%= messages[0] %>
         </div>
+      <% } %>
 
-        <div class="form-group mb-3">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" class="form-control" required
-                <% if (formData && formData.email) { %> value="<%= formData.email %>" <% } else { %> value="" <% } %>>
+
+
+      <%# Step 2a - Registration form creation with sticky re-fill %>
+
+      <form action="/register" method="POST" style="display:flex;flex-direction:column;gap:16px">
+        <div class="field">
+          <label for="username">USERNAME</label>
+          <input type="text" id="username" name="username" placeholder="What other collectors will call you" value="<%= formData ? formData.username : '' %>" required>
         </div>
-
-        <div class="form-group mb-3">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" class="form-control" required>
+        <div class="field">
+          <label for="email">EMAIL</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" value="<%= formData ? formData.email : '' %>" required>
         </div>
+        <div class="field">
+          <label for="password">PASSWORD</label>
+          <input type="password" id="password" name="password" placeholder="At least 6 characters" required>
+        </div>
+        <button type="submit" class="btn-submit">Create my vault</button>
+      </form>
 
-        <button type="submit" class="btn btn-primary">Register</button>
-    </form>
+      <span style="font:400 14px Archivo,sans-serif;color:#8a90a4">Already a member? <a href="/login">Log in</a></span>
+    </div>
+  </div>
 </div>
 
 
-<%- include('partials/footer') %>
+
+    <script>
+    // When the user types in the username box, an input event runs a function that copies the text onto the preview card.
+
+        var usernameInput = document.getElementById('username');   // grab the the username based on username ID
+        var cardName = document.getElementById('card-name');       // grab the card's name text based on card-name ID
+
+        // Reads what's typed and puts it on the card. 'Your Name' shows the placeholder when the box is empty.
+        function updateCard() {
+          var name = usernameInput.value.trim();
+          cardName.textContent = name || 'Your Name';              // placeholder show "Your Name" when the box is empty
+        }
+
+
+        usernameInput.addEventListener('input', updateCard);        // run that on every keystroke
+        updateCard();
+
+
+        // Show today's month and year as the join date
+        var now = new Date();
+        var mm = String(now.getMonth() + 1).padStart(2, '0');   // month, 01-12
+        var yy = String(now.getFullYear()).slice(-2);           // last 2 digits of year
+        document.getElementById('member-since').textContent = 'MEMBER SINCE ' + mm + '\u00B7' + yy;
+    </script>
+</body>
+</html>

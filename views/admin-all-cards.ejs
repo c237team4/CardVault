@@ -1,0 +1,421 @@
+<%- include('partials/header', { title: 'All Cards - CardVault' }) %>
+
+<div class="bg-light min-vh-100 py-5">
+
+    <div class="container">
+
+
+        <!-- Page Header -->
+
+        <div class="d-flex justify-content-between align-items-center mb-5">
+
+            <div>
+
+                <h1 class="fw-bold">
+                    All Cards
+                </h1>
+
+                <p class="text-muted">
+                    View all cards collected by users.
+                </p>
+
+            </div>
+
+
+            <a href="/admin-dashboard" class="btn btn-secondary">
+
+                Back to Dashboard
+
+            </a>
+
+        </div>
+
+
+        <!-- Search and Filter -->
+
+        <div class="card shadow border-0 mb-4">
+
+            <div class="card-body">
+
+
+                <form method="GET" action="/admin/all-cards">
+
+
+                    <div class="row g-3">
+
+
+                        <!-- Search -->
+
+                        <div class="col-md-5">
+
+                            <input type="text"
+                                   name="search"
+                                   class="form-control"
+                                   placeholder="Search card name..."
+                                   value="<%= search %>">
+
+                        </div>
+
+
+                        <!-- Category -->
+
+                        <div class="col-md-3">
+
+                            <select name="category" class="form-select">
+
+
+                                <option value="">
+
+                                    All Categories
+
+                                </option>
+
+
+
+                                <% categories.forEach(category => { %>
+
+
+                                    <option value="<%= category.category %>"
+                                        <%= searchCategory === category.category ? 'selected' : '' %>>
+
+
+                                        <%= category.category %>
+
+
+                                    </option>
+
+
+                                <% }) %>
+
+
+                            </select>
+
+
+                        </div>
+
+
+                        <!-- Rarity -->
+
+                        <div class="col-md-3">
+
+                            <select name="rarity" class="form-select">
+
+
+                                <option value="">
+
+                                    All Rarities
+
+                                </option>
+
+
+
+                                <% rarities.forEach(rarity => { %>
+
+
+                                    <option value="<%= rarity.rarity %>"
+                                        <%= searchRarity === rarity.rarity ? 'selected' : '' %>>
+
+
+                                        <%= rarity.rarity %>
+
+
+                                    </option>
+
+
+                                <% }) %>
+
+
+                            </select>
+
+
+                        </div>
+
+
+                        <!-- Search Button -->
+
+                        <div class="col-md-1">
+
+
+                            <button class="btn btn-primary w-100">
+
+                                Search
+
+                            </button>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </form>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- Card Grid -->
+
+
+        <div class="row g-4">
+
+
+
+            <% if(cards.length > 0){ %>
+
+
+
+                <% cards.forEach(card => { %>
+
+
+
+                    <div class="col-md-4 col-lg-3">
+
+
+
+                        <div class="card shadow border-0 h-100 rounded-4 overflow-hidden">
+
+
+
+                            <!-- Card Image -->
+
+
+                            <% if(card.image){ %>
+
+
+                                <img src="/images/<%= card.image %>"
+                                     class="card-img-top"
+                                     style="height:220px; object-fit:contain;">
+
+
+
+                            <% } else { %>
+
+
+
+                                <div class="d-flex justify-content-center align-items-center bg-light"
+                                     style="height:220px;">
+
+
+                                    No Image
+
+
+                                </div>
+
+
+
+                            <% } %>
+
+
+
+
+
+                            <!-- Card Details -->
+
+
+                            <div class="card-body d-flex flex-column">
+
+
+                                <h5 class="card-title fw-bold">
+
+                                    <%= card.card_name %>
+
+                                </h5>
+
+
+
+
+
+                                <!-- Owner -->
+
+
+                                <p class="mb-3">
+
+                                    <strong>Owner:</strong>
+
+                                    <%= card.username %>
+
+                                </p>
+
+
+
+
+
+                                <!-- Category -->
+
+
+                                <div class="mb-2">
+
+
+                                    <span class="badge bg-primary">
+
+                                        Category
+
+                                    </span>
+
+
+                                    <span class="badge bg-primary ms-1">
+
+                                        <%= card.category %>
+
+                                    </span>
+
+
+                                </div>
+
+
+
+
+
+                                <!-- Rarity -->
+
+
+                                <div class="mb-2">
+
+
+                                    <span class="badge bg-danger">
+
+                                        Rarity
+
+                                    </span>
+
+
+                                    <span class="badge bg-danger ms-1">
+
+                                        <%= card.rarity %>
+
+                                    </span>
+
+
+                                </div>
+
+
+
+
+
+                                <!-- Condition -->
+
+
+                                <div class="mb-2">
+
+
+                                    <span class="badge bg-success">
+
+                                        Condition
+
+                                    </span>
+
+
+                                    <span class="badge bg-success ms-1">
+
+                                        <%= card.condition_name %>
+
+                                    </span>
+
+
+                                </div>
+
+
+
+
+
+                                <!-- Value -->
+
+
+                                <div class="mb-3">
+
+
+                                    <span class="badge bg-info">
+
+                                        Value
+
+                                    </span>
+
+
+                                    <span class="badge bg-info ms-1">
+
+                                        $<%= card.estimated_value %>
+
+                                    </span>
+
+
+                                </div>
+
+
+
+
+
+                                <!-- View Details Button -->
+
+
+                                <div class="mt-auto d-grid">
+
+
+                                    <a href="/admin/card/<%= card.card_id %>"
+                                       class="btn btn-dark rounded-pill">
+
+                                        View Details
+
+                                    </a>
+
+
+                                </div>
+
+
+
+                            </div>
+
+
+
+                        </div>
+
+
+
+                    </div>
+
+
+
+                <% }) %>
+
+
+
+            <% } else { %>
+
+
+
+
+                <div class="text-center py-5">
+
+
+                    <h5 class="text-muted">
+
+                        No cards found.
+
+                    </h5>
+
+
+                </div>
+
+
+
+            <% } %>
+
+
+
+
+        </div>
+
+
+
+    </div>
+
+
+</div>
+
+
+<%- include('partials/footer') %>

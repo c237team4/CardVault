@@ -1,6 +1,69 @@
-<%- include('partials/header', { title: 'CardVault - Home' }) %>
-
-
-
-
-<%- include('partials/footer') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardVault — Every card. One vault.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  body { background: #0a0c12; font-family: Archivo, system-ui, sans-serif; }
+  a { text-decoration: none; }
+  .btn-primary {
+    display: inline-block; padding: 16px 36px;
+    background: linear-gradient(180deg, #e0bf7c, #c9a35c);
+    color: #1c1508; font: 600 16px Archivo, sans-serif;
+    border-radius: 8px; box-shadow: 0 8px 28px rgba(214,179,106,.28);
+  }
+  .btn-primary:hover { filter: brightness(1.06); }
+  .btn-ghost {
+    display: inline-block; padding: 16px 30px;
+    border: 1px solid rgba(255,255,255,.24); color: #e8e4d8;
+    font: 500 16px Archivo, sans-serif; border-radius: 8px;
+  }
+  .btn-ghost:hover { border-color: rgba(255,255,255,.5); color: #fff; }
+  .chip {
+    padding: 8px 18px; border: 1px solid rgba(255,255,255,.14);
+    border-radius: 999px; font: 400 13px Archivo, sans-serif; color: #aab0c0;
+  }
+  .fan-card {
+    position: absolute; left: 50%; bottom: 0;
+    width: 186px; height: 261px; object-fit: cover;
+    border-radius: 10px; border: 1px solid rgba(255,255,255,.1);
+    box-shadow: 0 18px 44px rgba(0,0,0,.6);
+  }
+</style>
+</head>
+<body>
+<div style="position:relative;width:100%;height:100vh;min-height:660px;overflow:hidden;background:radial-gradient(120% 100% at 50% 0%,#181d2e 0%,#0e1119 55%,#0a0c12 100%)">
+  <div style="position:absolute;inset:22px;border:1px solid rgba(203,166,95,.26);pointer-events:none;z-index:5"></div>
+  <div style="position:absolute;left:50%;bottom:-38px;transform:translateX(-50%);width:820px;height:220px;background:radial-gradient(50% 50% at 50% 50%,rgba(214,179,106,.16),transparent 70%);z-index:1"></div>
+  <div style="position:absolute;left:50%;bottom:-52px;width:1000px;height:430px;transform:translateX(-50%);z-index:2">
+    <img class="fan-card" src="/images/Pokemon/umbreon.jpg" alt="Umbreon card" style="transform:translateX(calc(-50% - 316px)) translateY(78px) rotate(-24deg)">
+    <img class="fan-card" src="/images/NBA/kobe.jpg" alt="Kobe Bryant card" style="transform:translateX(calc(-50% - 166px)) translateY(24px) rotate(-12deg)">
+    <img class="fan-card" src="/images/Yu-Gi-Oh/blue eyes white dragon.jpg" alt="Blue-Eyes White Dragon card" style="transform:translateX(calc(-50% + 166px)) translateY(24px) rotate(12deg)">
+    <img class="fan-card" src="/images/One Piece/zoro.jpg" alt="Zoro card" style="transform:translateX(calc(-50% + 316px)) translateY(78px) rotate(24deg)">
+    <img class="fan-card" src="/images/Pokemon/Charizard.jpg" alt="Charizard card" style="width:196px;height:275px;border-color:rgba(255,255,255,.14);box-shadow:0 24px 60px rgba(0,0,0,.7),0 0 40px rgba(214,179,106,.12);transform:translateX(-50%) translateY(-2px)">
+  </div>
+  <div style="position:relative;z-index:4;display:flex;flex-direction:column;align-items:center;text-align:center;padding:clamp(44px,8vh,76px) 32px 0">
+    <div style="width:40px;height:40px;border:1px solid rgba(203,166,95,.55);transform:rotate(45deg);display:flex;align-items:center;justify-content:center">
+      <span style="transform:rotate(-45deg);font:600 13px Archivo,sans-serif;letter-spacing:.08em;color:#cba65f">CV</span>
+    </div>
+    <div style="margin-top:16px;font:600 12px Archivo,sans-serif;letter-spacing:.42em;color:#cba65f">CARDVAULT</div>
+    <div style="margin-top:8px;font:500 10.5px Archivo,sans-serif;letter-spacing:.3em;color:#6d7488">BY TEAM 4</div>
+    <h1 style="margin:clamp(14px,3vh,26px) 0 0;font:400 clamp(54px,7vw,90px)/1.02 'Instrument Serif',serif;color:#f2ede1;letter-spacing:-.01em">Every card. One vault.</h1>
+    <p style="margin:20px 0 0;max-width:540px;font:400 18px/1.55 Archivo,sans-serif;color:#99a0b4;text-wrap:pretty">Catalogue your entire collection — every set, every grade, every treasure — in one secure, structured place.</p>
+    <div style="display:flex;gap:14px;margin-top:clamp(20px,4vh,32px)">
+      <a class="btn-primary" href="/register">Start your vault</a>
+      <a class="btn-ghost" href="/login">Log in</a>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:clamp(18px,3.6vh,30px)">
+      <span class="chip">Trading card games</span>
+      <span class="chip">Sports cards</span>
+      <span class="chip">Everything else</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

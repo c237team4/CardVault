@@ -1,0 +1,85 @@
+<%- include('partials/header', { title: 'Edit Role - CardVault' }) %>
+
+<div class="bg-light min-vh-100 py-5">
+
+    <div class="container">
+
+        <div class="card shadow border-0">
+
+            <div class="card-header bg-dark text-white">
+
+                <h4 class="mb-0">
+                    Edit User Role
+                </h4>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <h5>
+                    Username:
+                    <strong><%= selectedUser.username %></strong>
+                </h5>
+
+                <p>
+                    Email:
+                    <%= selectedUser.email %>
+                </p>
+
+
+                <form action="/admin/edit-role/<%= selectedUser.user_id %>" method="POST">
+
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Select Role
+                        </label>
+
+
+                        <select name="role" class="form-select">
+
+                            <option value="user"
+                                <%= selectedUser.role === 'user' ? 'selected' : '' %>>
+                                User
+                            </option>
+
+
+                            <option value="admin"
+                                <%= selectedUser.role === 'admin' ? 'selected' : '' %>>
+                                Admin
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <button type="submit" class="btn btn-warning text-white">
+
+                        Update Role
+
+                    </button>
+
+
+                    <a href="/admin-dashboard" class="btn btn-secondary">
+
+                        Cancel
+
+                    </a>
+
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<%- include('partials/footer') %>
