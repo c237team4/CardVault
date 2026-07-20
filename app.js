@@ -222,7 +222,7 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
 
     const userId = req.session.user.user_id;
 
-    const sql = `
+    const cardSql = `
         SELECT cards.*,
                conditions.condition_name
         FROM cards
@@ -232,19 +232,37 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
         ORDER BY date_added DESC
     `;
 
-    connection.query(sql, [userId], (err, cards) => {
+    const categorySql = `
+        SELECT DISTINCT category
+        FROM cards
+        WHERE user_id = ?
+        ORDER BY category
+    `;
+
+    connection.query(categorySql, [userId], (err, categories) => {
+
         if (err) {
             console.error(err);
-            return res.status(500).send('Database error');
+            return res.status(500).send("Database error");
         }
 
-        res.render('dashboard', {
-            user: req.session.user,
-            cards: cards,
-            search: "",
-            categoryFilter: "",
-            categories: []
+        connection.query(cardSql, [userId], (err, cards) => {
+
+            if (err) {
+                console.error(err);
+                return res.status(500).send("Database error");
+            }
+
+            res.render("dashboard", {
+                user: req.session.user,
+                cards: cards,
+                categories: categories,
+                search: "",
+                categoryFilter: ""
+            });
+
         });
+
     });
 
 });
@@ -300,9 +318,51 @@ app.get('/card/:id', checkAuthenticated, (req, res) => {
 // Removing Information + admin moderation
 // Routes: POST /delete-card/:id
 // -----------------------------------------------------------------------------
+app.post('/delete-card/:id', checkAuthenticated, (req, res) => {
 
+    const id = req.params.id;
+    const sql = `
+        DELETE FROM cards
+        WHERE card_id = ?
+        AND user_id = ?
+    `;
 
+    connection.query(sql, [id, req.session.user.user_id], (err, result) => {
 
+        if (err) {
+            console.log(err);
+            return res.send("Unable to delete card");}
+        res.redirect('/dashboard');
+
+    });
+});
+
+// Admin can delete any card
+app.post('/admin/delete-card/:id',
+    checkAuthenticated,
+    checkAdmin,
+    (req, res) => {
+
+        const cardId = req.params.id;
+        const userId = req.body.userId;
+
+        const sql = `
+            DELETE FROM cards
+            WHERE card_id = ?
+        `;
+
+        connection.query(sql, [cardId], (err, result) => {
+
+            if (err) {
+                console.log(err);
+                return res.send("Unable to delete card");
+            }
+
+            
+            res.redirect('/admin/user/' + userId);
+
+        });
+});
 
 // -----------------------------------------------------------------------------
 // STUDENT F  |  Owner: Zhan Fung

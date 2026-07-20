@@ -135,6 +135,21 @@
                                 Added: <%= card.date_added %>
                             </small>
 
+                            <form action="/admin/delete-card/<%= card.card_id %>"
+                                  method="POST"
+                                  onsubmit="return confirm('Delete this card?');">
+
+                                 <input
+                                     type="hidden"
+                                     name="userId"
+                                     value="<%= selectedUser.user_id %>">
+                                
+                                <button class="btn btn-danger btn-sm float-end">
+                                    Delete
+                                </button>
+                                
+                            </form>
+
                         </div>
 
                     </div>
