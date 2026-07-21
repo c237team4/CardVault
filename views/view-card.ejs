@@ -110,7 +110,11 @@
                             <a href="/dashboard" class="btn btn-outline-dark px-4">
                                 ← Back to Collection
                             </a>
-                            
+
+                            <a href="/edit-card/<%= card.card_id %>" class="btn btn-primary px-4">
+                                Edit Card
+                            </a>
+
                             <form action="/delete-card/<%= card.card_id %>"
                                   method="POST"
                                   onsubmit="return confirm('Are you sure you want to delete this card?');">

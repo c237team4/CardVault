@@ -244,15 +244,22 @@
 
 
 
-                        <!-- View Button -->
+                        <!-- View / Edit Buttons -->
 
-                        <div class="d-grid">
+                        <div class="d-grid gap-2">
 
 
                             <a href="/card/<%= card.card_id %>"
                                class="btn btn-dark rounded-pill">
 
                                 View Details
+
+                            </a>
+
+                            <a href="/edit-card/<%= card.card_id %>"
+                               class="btn btn-outline-primary rounded-pill">
+
+                                Edit Card
 
                             </a>
 

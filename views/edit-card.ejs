@@ -1,6 +1,154 @@
-<%- include('partials/header', { title: 'Edit Card - CardVault' }) %>
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardVault - Edit Card</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .form-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem;
+        }
+    </style>
+</head>
 
+<body>
 
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-7">
 
-<%- include('partials/footer') %>
+            <div class="form-card">
+                <h2 class="fw-bold text-center mb-2">Edit Card</h2>
+                <p class="text-muted text-center mb-4">Update the details of this card in your vault collection.</p>
+                <hr class="mb-4">
+
+                <% if (messages && messages.length > 0) { %>
+                    <div class="alert alert-danger">
+                        <% messages.forEach(function(msg) { %>
+                            <div><%= msg %></div>
+                        <% }); %>
+                    </div>
+                <% } %>
+
+                <form action="/edit-card/<%= card.card_id %>" method="POST" enctype="multipart/form-data">
+
+                    <!-- Hidden field to preserve the current image if no new one is uploaded -->
+                    <input type="hidden" name="existing_image" value="<%= card.image %>">
+
+                    <!-- Row 1: Card Name -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Card Name</label>
+                        <input type="text" class="form-control" name="card_name" value="<%= card.card_name %>" required>
+                    </div>
+
+                    <!-- Row 2: Genre & Condition Dropdowns -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Genre</label>
+                            <select class="form-select" name="genre_id" required>
+                                <option value="" disabled>Select Genre</option>
+                                <option value="1" <%= card.genre_id == 1 ? 'selected' : '' %>>Trading Card Games</option>
+                                <option value="2" <%= card.genre_id == 2 ? 'selected' : '' %>>Sport Cards</option>
+                                <option value="3" <%= card.genre_id == 3 ? 'selected' : '' %>>Others</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Condition</label>
+                            <select class="form-select" name="condition_id" required>
+                                <option value="" disabled>Select Condition</option>
+                                <option value="1" <%= card.condition_id == 1 ? 'selected' : '' %>>Mint</option>
+                                <option value="2" <%= card.condition_id == 2 ? 'selected' : '' %>>Near Mint</option>
+                                <option value="3" <%= card.condition_id == 3 ? 'selected' : '' %>>Excellent</option>
+                                <option value="4" <%= card.condition_id == 4 ? 'selected' : '' %>>Good</option>
+                                <option value="5" <%= card.condition_id == 5 ? 'selected' : '' %>>Played</option>
+                                <option value="6" <%= card.condition_id == 6 ? 'selected' : '' %>>Poor</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Category & Rarity Dropdowns -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Category / Franchise</label>
+                            <select class="form-select" name="category" required>
+                                <option value="" disabled>Select Category</option>
+                                <option <%= card.category === 'digimon' ? 'selected' : '' %>>digimon</option>
+                                <option <%= card.category === 'football' ? 'selected' : '' %>>football</option>
+                                <option <%= card.category === 'formula 1' ? 'selected' : '' %>>formula 1</option>
+                                <option <%= card.category === 'NBA' ? 'selected' : '' %>>NBA</option>
+                                <option <%= card.category === 'One Piece' ? 'selected' : '' %>>One Piece</option>
+                                <option <%= card.category === 'Pokemon' ? 'selected' : '' %>>Pokemon</option>
+                                <option <%= card.category === 'Yu-Gi-Oh!' ? 'selected' : '' %>>Yu-Gi-Oh!</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Rarity</label>
+                            <select class="form-select" name="rarity" required>
+                                <option value="" disabled>Select Rarity</option>
+                                <option <%= card.rarity === 'Common' ? 'selected' : '' %>>Common</option>
+                                <option <%= card.rarity === 'Uncommon' ? 'selected' : '' %>>Uncommon</option>
+                                <option <%= card.rarity === 'Rare' ? 'selected' : '' %>>Rare</option>
+                                <option <%= card.rarity === 'Holo Rare' ? 'selected' : '' %>>Holo Rare</option>
+                                <option <%= card.rarity === 'Ultra Rare' ? 'selected' : '' %>>Ultra Rare</option>
+                                <option <%= card.rarity === 'Secret Rare' ? 'selected' : '' %>>Secret Rare</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Financials & Quantity -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Purchase Price (S$)</label>
+                            <input type="number" step="0.01" class="form-control" name="purchase_price" value="<%= card.purchase_price %>" min="0" required>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Estimated Value (S$)</label>
+                            <input type="number" step="0.01" class="form-control" name="estimated_value" value="<%= card.estimated_value %>" min="0" required>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Quantity</label>
+                            <input type="number" class="form-control" name="quantity" value="<%= card.quantity %>" min="1" required>
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Remarks -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Remarks</label>
+                        <textarea class="form-control" name="remarks" rows="3"><%= card.remarks || '' %></textarea>
+                    </div>
+
+                    <!-- Row 6: Image Upload -->
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold">Card Image Artwork</label>
+                        <input type="file" class="form-control" name="image" accept="image/*">
+                    </div>
+                    <p class="text-muted small mb-4">Leave this empty to keep the current image.</p>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="/card/<%= card.card_id %>" class="btn btn-secondary px-4 me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 fw-semibold">Save Changes</button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
