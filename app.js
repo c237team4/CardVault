@@ -4,11 +4,32 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const multer = require('multer');
 const app = express();
+const fs = require('fs');
 
-// Set up multer for file uploads
+//find out exactly where the image needs to go on 
+const path = require('path');
+
+// Set up multer for file uploads & filter in to correct subfolder based on category
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'public/images'); // Directory to save uploaded files
+        // 1. Grab the category from the incoming form text fields
+        let folderName = req.body.category || 'Others';
+        
+        // 2. Clean up special characters to match your folder structures exactly
+        if (folderName === 'Yu-Gi-Oh!') {
+            folderName = 'Yu-Gi-Oh';
+        }
+
+        // 3. Construct the absolute path target
+        const targetDir = path.join(__dirname, 'public', 'images', folderName);
+
+        // 4. Create the folder automatically if it's missing
+        if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+        }
+
+        // 5. Send the file straight to its sorted home
+        cb(null, targetDir);
     },
     filename: (req, file, cb) => {
         cb(null, file.originalname);
@@ -250,9 +271,84 @@ app.post('/forgot-password', (req, res) => {
 // Adding New Information -- add a card to your collection
 // Routes: GET /add-card, POST /add-card   (POST uses upload.single('image'))
 // -----------------------------------------------------------------------------
+// Display Add Card Page
+app.get('/add-card', checkAuthenticated, (req, res) => {
+    res.render('add-card', {
+        user: req.session.user
+    });
+});
 
 
+// Add Card
+// 2. PROCESS ADD CARD FORM (POST)
+// ==========================================
+app.post('/add-card', checkAuthenticated, upload.single('image'), (req, res) => {
+    const { 
+        card_name, 
+        genre_id, 
+        condition_id, 
+        category, 
+        rarity, 
+        estimated_value, 
+        quantity, 
+        remarks, 
+        purchase_price 
+    } = req.body;
 
+    // Extract the logged-in user's ID from session
+    const userId = req.session.user.id || req.session.user.user_id;
+
+    if (!userId) {
+        req.flash('error', 'Session invalid or expired. Please log in again.');
+        return res.redirect('/login');
+    }
+
+    // Determine the dynamic relative path string for the database
+    let dbImageValue = 'default.png'; 
+    if (req.file) {
+        let folderName = category || 'Others';
+        if (folderName === 'Yu-Gi-Oh!') {
+            folderName = 'Yu-Gi-Oh';
+        }
+        dbImageValue = `${folderName}/${req.file.originalname}`;
+    }
+
+    // SQL Query matching all 11 columns (including user_id)
+    const query = `
+        INSERT INTO cards (
+            card_name, genre_id, condition_id, category, rarity, 
+            estimated_value, quantity, remarks, purchase_price, image, user_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    // Map fallbacks for empty/optional form fields
+    const values = [
+        card_name, 
+        genre_id, 
+        condition_id, 
+        category, 
+        rarity, 
+        estimated_value || 0.00, 
+        quantity || 1, 
+        remarks || null, 
+        purchase_price || 0.00, 
+        dbImageValue,
+        userId 
+    ];
+
+    // Execute using your active 'connection' instance
+    connection.query(query, values, (err, result) => {
+        if (err) {
+            console.error("Database Error details:", err);
+            // Redirects back to the form with a clear warning instead of crashing
+            req.flash('error', 'Failed to save card to database. Please try again.');
+            return res.redirect('/add-card');
+        }
+        
+        req.flash('success', 'Card added successfully!');
+        res.redirect('/dashboard');
+    });
+});
 
 // -----------------------------------------------------------------------------
 // STUDENT C  |  Owner: Sammi
@@ -359,9 +455,51 @@ app.get('/card/:id', checkAuthenticated, (req, res) => {
 // Removing Information + admin moderation
 // Routes: POST /delete-card/:id
 // -----------------------------------------------------------------------------
+app.post('/delete-card/:id', checkAuthenticated, (req, res) => {
 
+    const id = req.params.id;
+    const sql = `
+        DELETE FROM cards
+        WHERE card_id = ?
+        AND user_id = ?
+    `;
 
+    connection.query(sql, [id, req.session.user.user_id], (err, result) => {
 
+        if (err) {
+            console.log(err);
+            return res.send("Unable to delete card");}
+        res.redirect('/dashboard');
+
+    });
+});
+
+// Admin can delete any card
+app.post('/admin/delete-card/:id',
+    checkAuthenticated,
+    checkAdmin,
+    (req, res) => {
+
+        const cardId = req.params.id;
+        const userId = req.body.userId;
+
+        const sql = `
+            DELETE FROM cards
+            WHERE card_id = ?
+        `;
+
+        connection.query(sql, [cardId], (err, result) => {
+
+            if (err) {
+                console.log(err);
+                return res.send("Unable to delete card");
+            }
+
+            
+            res.redirect('/admin/user/' + userId);
+
+        });
+});
 
 // -----------------------------------------------------------------------------
 // STUDENT F  |  Owner: Zhan Fung
