@@ -10,6 +10,7 @@
         body {
             background-color: #f8f9fa;
         }
+
         .form-card {
             background: #ffffff;
             border-radius: 12px;
@@ -27,7 +28,9 @@
 
             <div class="form-card">
                 <h2 class="fw-bold text-center mb-2">Edit Card</h2>
-                <p class="text-muted text-center mb-4">Update the details of this card in your vault collection.</p>
+                <p class="text-muted text-center mb-4">
+                    Update the details of this card in your vault collection.
+                </p>
                 <hr class="mb-4">
 
                 <% if (messages && messages.length > 0) { %>
@@ -38,18 +41,22 @@
                     </div>
                 <% } %>
 
-                <form action="/edit-card/<%= card.card_id %>" method="POST" enctype="multipart/form-data">
+                <form action="/edit-card/<%= card.card_id %>"
+                      method="POST"
+                      enctype="multipart/form-data"
+                      onsubmit="return confirmSave()">
 
                     <!-- Hidden field to preserve the current image if no new one is uploaded -->
                     <input type="hidden" name="existing_image" value="<%= card.image %>">
 
-                    <!-- Row 1: Card Name -->
+                    <!-- Card Name -->
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Card Name</label>
-                        <input type="text" class="form-control" name="card_name" value="<%= card.card_name %>" required>
+                        <input type="text" class="form-control" name="card_name"
+                            value="<%= card.card_name %>" required>
                     </div>
 
-                    <!-- Row 2: Genre & Condition Dropdowns -->
+                    <!-- Genre & Condition -->
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Genre</label>
@@ -75,7 +82,7 @@
                         </div>
                     </div>
 
-                    <!-- Row 3: Category & Rarity Dropdowns -->
+                    <!-- Category & Rarity -->
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Category / Franchise</label>
@@ -105,50 +112,73 @@
                         </div>
                     </div>
 
-                    <!-- Row 4: Financials & Quantity -->
+                    <!-- Price & Quantity -->
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">Purchase Price (S$)</label>
-                            <input type="number" step="0.01" class="form-control" name="purchase_price" value="<%= card.purchase_price %>" min="0" required>
+                            <input type="number" step="0.01" class="form-control"
+                                name="purchase_price"
+                                value="<%= card.purchase_price %>"
+                                min="0" required>
                         </div>
 
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">Estimated Value (S$)</label>
-                            <input type="number" step="0.01" class="form-control" name="estimated_value" value="<%= card.estimated_value %>" min="0" required>
+                            <input type="number" step="0.01" class="form-control"
+                                name="estimated_value"
+                                value="<%= card.estimated_value %>"
+                                min="0" required>
                         </div>
 
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">Quantity</label>
-                            <input type="number" class="form-control" name="quantity" value="<%= card.quantity %>" min="1" required>
+                            <input type="number" class="form-control"
+                                name="quantity"
+                                value="<%= card.quantity %>"
+                                min="1" required>
                         </div>
                     </div>
 
-                    <!-- Row 5: Remarks -->
+                    <!-- Remarks -->
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Remarks</label>
                         <textarea class="form-control" name="remarks" rows="3"><%= card.remarks || '' %></textarea>
                     </div>
 
-                    <!-- Row 6: Image Upload -->
+                    <!-- Image -->
                     <div class="mb-2">
                         <label class="form-label fw-semibold">Card Image Artwork</label>
                         <input type="file" class="form-control" name="image" accept="image/*">
                     </div>
-                    <p class="text-muted small mb-4">Leave this empty to keep the current image.</p>
 
-                    <!-- Action Buttons -->
+                    <p class="text-muted small mb-4">
+                        Leave this empty to keep the current image.
+                    </p>
+
+                    <!-- Buttons -->
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <a href="/card/<%= card.card_id %>" class="btn btn-secondary px-4 me-md-2">Cancel</a>
-                        <button type="submit" class="btn btn-primary px-5 fw-semibold">Save Changes</button>
+                        <a href="/card/<%= card.card_id %>" class="btn btn-secondary px-4 me-md-2">
+                            Cancel
+                        </a>
+
+                        <button type="submit" class="btn btn-primary px-5 fw-semibold">
+                            Save Changes
+                        </button>
                     </div>
 
                 </form>
+
             </div>
 
         </div>
     </div>
 </div>
 
+<script>
+    function confirmSave() {
+        return confirm("Are you sure you want to save these changes?");
+    }
+</script>
+
 </body>
 </html>
-
