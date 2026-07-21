@@ -453,6 +453,122 @@ app.get('/card/:id', checkAuthenticated, (req, res) => {
 // Routes: GET /edit-card/:id, POST /edit-card/:id
 // -----------------------------------------------------------------------------
 
+// Show edit form pre-filled with the card's current data
+app.get('/edit-card/:id', checkAuthenticated, (req, res) => {
+
+    const cardId = req.params.id;
+    const userId = req.session.user.user_id;
+
+    const sql = `
+        SELECT cards.*,
+               conditions.condition_name
+        FROM cards
+        LEFT JOIN conditions
+        ON cards.condition_id = conditions.condition_id
+        WHERE cards.card_id = ?
+        AND cards.user_id = ?
+    `;
+
+    connection.query(sql, [cardId, userId], (err, results) => {
+
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        }
+
+        if (results.length === 0) {
+            req.flash('error', 'Card not found or you do not have permission to edit it.');
+            return res.redirect('/dashboard');
+        }
+
+        res.render('edit-card', {
+            user: req.session.user,
+            card: results[0],
+            messages: req.flash('error')
+        });
+
+    });
+
+});
+
+// Process the edit form (image upload is optional -- keep the old image if none is chosen)
+app.post('/edit-card/:id', checkAuthenticated, upload.single('image'), (req, res) => {
+
+    const cardId = req.params.id;
+    const userId = req.session.user.user_id;
+
+    const {
+        card_name,
+        genre_id,
+        condition_id,
+        category,
+        rarity,
+        estimated_value,
+        quantity,
+        remarks,
+        purchase_price,
+        existing_image   // hidden field in the form holding the current image path
+    } = req.body;
+
+    // Work out the image value the same way add-card does
+    let dbImageValue = existing_image || 'default.png';
+    if (req.file) {
+        let folderName = category || 'Others';
+        if (folderName === 'Yu-Gi-Oh!') {
+            folderName = 'Yu-Gi-Oh';
+        }
+        dbImageValue = `${folderName}/${req.file.originalname}`;
+    }
+
+    const sql = `
+        UPDATE cards
+        SET card_name = ?,
+            genre_id = ?,
+            condition_id = ?,
+            category = ?,
+            rarity = ?,
+            estimated_value = ?,
+            quantity = ?,
+            remarks = ?,
+            purchase_price = ?,
+            image = ?
+        WHERE card_id = ?
+        AND user_id = ?
+    `;
+
+    const values = [
+        card_name,
+        genre_id,
+        condition_id,
+        category,
+        rarity,
+        estimated_value || 0.00,
+        quantity || 1,
+        remarks || null,
+        purchase_price || 0.00,
+        dbImageValue,
+        cardId,
+        userId
+    ];
+
+    connection.query(sql, values, (err, result) => {
+
+        if (err) {
+            console.error('Database Error details:', err);
+            req.flash('error', 'Failed to update card. Please try again.');
+            return res.redirect('/edit-card/' + cardId);
+        }
+
+        if (result.affectedRows === 0) {
+            req.flash('error', 'Card not found or you do not have permission to edit it.');
+            return res.redirect('/dashboard');
+        }
+
+        req.flash('success', 'Card updated successfully!');
+        res.redirect('/card/' + cardId);
+    });
+
+});
 
 
 
