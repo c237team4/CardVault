@@ -22,22 +22,11 @@
 
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav me-auto">
-        <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
-          <li class="nav-item">
-            <a class="nav-link" href="/admin-dashboard">Admin Dashboard</a>
-          </li>
-          <% } %>
         </ul>
 
       <ul class="navbar-nav">
         <% if (typeof user !== 'undefined' && user) { %>
-          <li class="nav-item">
-            <span class="navbar-text me-3">Hi, <%= user.username %></span>
-          </li>
           <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
-        <% } else { %>
-          <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
-          <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
         <% } %>
       </ul>
     </div>
