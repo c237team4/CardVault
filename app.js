@@ -87,8 +87,6 @@ const checkAuthenticated = (req, res, next) => {
 };
 
 // Middleware to check if user is admin
-// Note: req.session.user may be undefined (logged out), so check that FIRST --
-// reading .role off undefined would crash the server instead of redirecting.
 const checkAdmin = (req, res, next) => {
     if (req.session.user && req.session.user.role === 'admin') {
         return next();
@@ -98,9 +96,7 @@ const checkAdmin = (req, res, next) => {
     }
 };
 
-// Middleware for form validation
-// 'role' is deliberately NOT accepted from the form -- if it were, anyone could
-// register themselves as an admin. The database defaults role to 'user'.
+// Middleware for registration form validation
 const validateRegistration = (req, res, next) => {
     const { username, email, password } = req.body;
 
@@ -117,6 +113,31 @@ const validateRegistration = (req, res, next) => {
     }
     next();
 };
+
+// Middleware for password reset validation
+const validateReset = (req, res, next) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/forgot-password');
+    }
+    if (password.length < 6) {
+        req.flash('error', 'Password should be at least 6 characters long');
+        return res.redirect('/forgot-password');
+    }
+    next();   // ← "you passed, go on through to the route"
+};
+
+// Middleware for login form validation
+const validateLogin = (req, res, next) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/login');
+    }
+    next();
+};
+
 
 // =============================================================================
 // ROUTES
@@ -192,13 +213,8 @@ app.get('/login', (req, res) => {
 
 // Step 4c POST /login
 
-app.post('/login', (req, res) => {
+app.post('/login', validateLogin, (req, res) => {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-        req.flash('error', 'All fields are required.');
-        return res.redirect('/login');
-    }
 
     const sql = 'SELECT * FROM users WHERE email = ? AND password = SHA1(?)';
     connection.query(sql, [email, password], (err, results) => {
@@ -233,19 +249,9 @@ app.get('/forgot-password', (req, res) => {
 
 
 // Step 6 POST /forgot-password
-
-app.post('/forgot-password', (req, res) => {
+// Validation is handled by validateReset; this route just does the update.
+app.post('/forgot-password', validateReset, (req, res) => {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-        req.flash('error', 'All fields are required.');
-        return res.redirect('/forgot-password');
-    }
-
-    if (password.length < 6) {
-        req.flash('error', 'Password should be at least 6 or more characters long');
-        return res.redirect('/forgot-password');
-    }
 
     const sql = 'UPDATE users SET password = SHA1(?) WHERE email = ?';
     connection.query(sql, [password, email], (err, result) => {
