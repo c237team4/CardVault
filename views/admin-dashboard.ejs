@@ -1,5 +1,37 @@
 <%- include('partials/header', { title: 'Admin Dashboard - CardVault' }) %>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==== CardVault dark vault theme — styling overrides only ==== */
+body { background: #0a0c12; font-family: Archivo, system-ui, sans-serif; }
+.bg-light { background: radial-gradient(120% 100% at 50% 0%, #181d2e 0%, #0e1119 55%, #0a0c12 100%) !important; }
+h1, .display-4 { font-family: 'Instrument Serif', serif; font-weight: 400 !important; color: #f2ede1; }
+.text-muted { color: #8a90a4 !important; }
+.card { background: #12151e; border: 1px solid rgba(203,166,95,.25) !important; }
+.shadow { box-shadow: 0 20px 50px rgba(0,0,0,.45) !important; }
+.card-header.bg-dark { background: #0d1017 !important; border-bottom: 1px solid rgba(203,166,95,.25); }
+.card-header h4 { font-family: 'Instrument Serif', serif; font-weight: 400; color: #f2ede1; letter-spacing: .02em; }
+.card-body h5.text-secondary { color: #cba65f !important; font: 600 12px Archivo, sans-serif; letter-spacing: .3em; text-transform: uppercase; }
+.display-4 { color: #cba65f; }
+.table { color: #d8dce8; }
+.table > :not(caption) > * > * { background: transparent; color: #d8dce8; border-bottom-color: rgba(255,255,255,.08); }
+.table thead.table-light th { background: #171c28 !important; color: #cba65f !important; font: 600 12px Archivo, sans-serif; letter-spacing: .12em; text-transform: uppercase; border-bottom-color: rgba(203,166,95,.3) !important; }
+.table-hover > tbody > tr:hover > * { background: rgba(214,179,106,.06); color: #f2ede1; }
+.btn-success { background: linear-gradient(180deg, #e0bf7c, #c9a35c); border: none; color: #1c1508; font-weight: 600; }
+.btn-success:hover { background: linear-gradient(180deg, #e8c988, #d3ad64); color: #1c1508; }
+.btn-primary { background: transparent; border: 1px solid rgba(203,166,95,.55); color: #cba65f; }
+.btn-primary:hover { background: rgba(214,179,106,.15); border-color: #cba65f; color: #e0bf7c; }
+.btn-warning { background: #7d5f2a; border: none; }
+.btn-warning:hover { background: #94722f; }
+.badge.bg-danger { background: linear-gradient(180deg, #e0bf7c, #c9a35c) !important; color: #1c1508; }
+.badge.bg-secondary { background: rgba(255,255,255,.12) !important; color: #aab0c0; }
+/* ==== end overrides ==== */
+</style>
+
+
+
+
 <div class="bg-light min-vh-100 py-5">
 
     <div class="container">
