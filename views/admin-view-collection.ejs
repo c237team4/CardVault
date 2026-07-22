@@ -1,5 +1,41 @@
 <%- include('partials/header', { title: 'User Collection - CardVault' }) %>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==== CardVault dark vault theme — styling overrides only ==== */
+body { background: #0a0c12; font-family: Archivo, system-ui, sans-serif; }
+.bg-light { background: radial-gradient(120% 100% at 50% 0%, #181d2e 0%, #0e1119 55%, #0a0c12 100%) !important; }
+h2, h4, h5 { font-family: 'Instrument Serif', serif; font-weight: 400 !important; }
+.text-muted { color: #8a90a4 !important; }
+.card { background: #12151e; border: 1px solid rgba(203,166,95,.25) !important; }
+.shadow, .shadow-sm { box-shadow: 0 20px 50px rgba(0,0,0,.45) !important; }
+.card-header.bg-primary { background: #0d1017 !important; border-bottom: 1px solid rgba(203,166,95,.25); }
+.card-header.bg-dark { background: #0d1017 !important; border-bottom: 1px solid rgba(203,166,95,.25); }
+.card-header h2, .card-header h4 { color: #f2ede1; }
+.card-body { color: #d8dce8; }
+.card-body h4 { color: #f2ede1; }
+.card-body b { color: #cba65f; }
+.card-body .card-img-top { background: #171c28; }
+.card-body hr { border-color: rgba(203,166,95,.3); opacity: 1; }
+.text-success { color: #cba65f !important; }
+.text-primary { color: #a3bcf2 !important; }
+.btn-secondary { background: transparent; border: 1px solid rgba(203,166,95,.5); color: #cba65f; }
+.btn-secondary:hover { background: rgba(214,179,106,.15); border-color: #cba65f; color: #e0bf7c; }
+.btn-danger { background: transparent; border: 1px solid rgba(224,120,120,.5); color: #e8a0a0; }
+.btn-danger:hover { background: rgba(224,120,120,.12); border-color: #e8a0a0; color: #f2b8b8; }
+.badge.bg-primary { background: rgba(100,140,225,.18) !important; color: #a3bcf2; }
+.badge.bg-info { background: rgba(120,195,220,.16) !important; }
+.badge.bg-info.text-dark { color: #a8d9e8 !important; }
+.badge.bg-warning { background: rgba(214,179,106,.2) !important; }
+.badge.bg-warning.text-dark { color: #e0c993 !important; }
+.badge.bg-danger { background: rgba(214,179,106,.18) !important; color: #e0c993; }
+.badge.bg-success { background: rgba(110,200,140,.16) !important; color: #a2d9b4; }
+.bg-secondary { background: #171c28 !important; color: #6d7488 !important; }
+.alert-warning { background: rgba(214,179,106,.08); border: 1px solid rgba(203,166,95,.35); color: #e0c993; }
+/* ==== end overrides ==== */
+</style>
+
 <div class="bg-light min-vh-100 py-5">
 
 <div class="container">
