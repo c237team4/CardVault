@@ -53,72 +53,104 @@ h4 { color: #f2ede1; }
 
         </div>
 
-        <!-- Search & Filter -->
-        <div class="card shadow-sm mb-4">
+<!-- Search & Filter -->
+<div class="card shadow-sm mb-4">
 
-            <div class="card-body">
+    <div class="card-body">
 
-                <form action="/search" method="GET">
+        <form action="/search" method="GET">
 
-                    <div class="row g-3">
+            <div class="row g-3">
 
-                        <!-- Search -->
-                        <div class="col-md-5">
+                <!-- Search -->
+                <div class="col-md-4">
 
-                            <input
-                                type="text"
-                                name="search"
-                                class="form-control"
-                                placeholder="Search by card name"
-                                value="<%= typeof search !== 'undefined' ? search : '' %>">
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Search by card name"
+                        value="<%= typeof search !== 'undefined' ? search : '' %>">
 
-                        </div>
+                </div>
 
-                        <!-- Category -->
-                        <div class="col-md-5">
 
-                            <select name="category" class="form-select">
+                <!-- Category -->
+                <div class="col-md-3">
 
-                                <option value="">
-                                    All Categories
+                    <select name="category" class="form-select">
+
+                        <option value="">
+                            All Categories
+                        </option>
+
+                        <% if (typeof categories !== 'undefined') { %>
+
+                            <% categories.forEach(category => { %>
+
+                                <option
+                                    value="<%= category.category %>"
+                                    <%= categoryFilter === category.category ? 'selected' : '' %>>
+
+                                    <%= category.category %>
+
                                 </option>
 
-                                <% if (typeof categories !== 'undefined') { %>
+                            <% }) %>
 
-                                    <% categories.forEach(category => { %>
+                        <% } %>
 
-                                        <option
-                                            value="<%= category.category %>"
-                                            <%= categoryFilter === category.category ? 'selected' : '' %>>
+                    </select>
 
-                                            <%= category.category %>
+                </div>
 
-                                        </option>
 
-                                    <% }) %>
+                <!-- Rarity -->
+                <div class="col-md-3">
 
-                                <% } %>
+                    <select name="rarity" class="form-select">
 
-                            </select>
+                        <option value="">
+                            All Rarities
+                        </option>
 
-                        </div>
+                        <% if (typeof rarities !== 'undefined') { %>
 
-                        <!-- Button -->
-                        <div class="col-md-2 d-grid">
+                            <% rarities.forEach(rarity => { %>
 
-                            <button type="submit" class="btn btn-dark">
-                                Search
-                            </button>
+                                <option
+                                    value="<%= rarity.rarity %>"
+                                    <%= rarityFilter === rarity.rarity ? 'selected' : '' %>>
 
-                        </div>
+                                    <%= rarity.rarity %>
 
-                    </div>
+                                </option>
 
-                </form>
+                            <% }) %>
+
+                        <% } %>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Button -->
+                <div class="col-md-2 d-grid">
+
+                    <button type="submit" class="btn btn-dark">
+                        Search
+                    </button>
+
+                </div>
 
             </div>
 
-        </div>
+        </form>
+
+    </div>
+
+</div>
 
         <% if(cards.length > 0){ %>
 

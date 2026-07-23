@@ -661,6 +661,8 @@ app.get('/search', checkAuthenticated, (req, res) => {
 
     const search = req.query.search || "";
     const category = req.query.category || "";
+    const rarity = req.query.rarity || "";
+
 
     const categorySql = `
         SELECT DISTINCT category
@@ -669,17 +671,27 @@ app.get('/search', checkAuthenticated, (req, res) => {
         ORDER BY category
     `;
 
-    const sql = `
-        SELECT cards.*,
-               conditions.condition_name
+
+    const raritySql = `
+        SELECT DISTINCT rarity
         FROM cards
-        LEFT JOIN conditions
-        ON cards.condition_id = conditions.condition_id
-        WHERE cards.user_id = ?
-        AND cards.card_name LIKE ?
-        AND cards.category LIKE ?
-        ORDER BY date_added DESC
+        WHERE user_id = ?
+        ORDER BY rarity
     `;
+
+
+    const sql = `
+    SELECT cards.*,
+           conditions.condition_name
+    FROM cards
+    LEFT JOIN conditions
+    ON cards.condition_id = conditions.condition_id
+    WHERE cards.user_id = ?
+    AND cards.card_name LIKE ?
+    AND cards.category LIKE ?
+    AND cards.rarity LIKE ?
+    ORDER BY date_added DESC
+`;
 
     connection.query(categorySql, [userId], (err, categories) => {
 
@@ -688,26 +700,49 @@ app.get('/search', checkAuthenticated, (req, res) => {
             return res.status(500).send("Database error");
         }
 
-        connection.query(
-            sql,
-            [userId, "%" + search + "%", "%" + category + "%"],
-            (err, cards) => {
 
-                if (err) {
-                    console.error(err);
-                    return res.status(500).send("Database error");
-                }
+        connection.query(raritySql, [userId], (err, rarities) => {
 
-                res.render("dashboard", {
-                    user: req.session.user,
-                    cards: cards,
-                    categories: categories,
-                    search: search,
-                    categoryFilter: category
-                });
-
+            if (err) {
+                console.error(err);
+                return res.status(500).send("Database error");
             }
-        );
+
+
+            connection.query(
+                sql,
+                [
+                    userId,
+                    "%" + search + "%",
+                    "%" + category + "%",
+                    "%" + rarity + "%"
+                ],
+                (err, cards) => {
+
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).send("Database error");
+                    }
+
+
+                    res.render("dashboard", {
+
+                        user: req.session.user,
+                        cards: cards,
+
+                        categories: categories,
+                        rarities: rarities,
+
+                        search: search,
+                        categoryFilter: category,
+                        rarityFilter: rarity
+
+                    });
+
+                }
+            );
+
+        });
 
     });
 
