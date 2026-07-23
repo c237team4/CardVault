@@ -465,6 +465,14 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
         ORDER BY category
     `;
 
+    const raritySql = `
+        SELECT DISTINCT rarity
+        FROM cards
+        WHERE user_id = ?
+        ORDER BY rarity
+    `;
+
+
     connection.query(categorySql, [userId], (err, categories) => {
 
         if (err) {
@@ -472,19 +480,33 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
             return res.status(500).send("Database error");
         }
 
-        connection.query(cardSql, [userId], (err, cards) => {
+
+        connection.query(raritySql, [userId], (err, rarities) => {
 
             if (err) {
                 console.error(err);
                 return res.status(500).send("Database error");
             }
 
-            res.render("dashboard", {
-                user: req.session.user,
-                cards: cards,
-                categories: categories,
-                search: "",
-                categoryFilter: ""
+
+            connection.query(cardSql, [userId], (err, cards) => {
+
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send("Database error");
+                }
+
+
+                res.render("dashboard", {
+                    user: req.session.user,
+                    cards: cards,
+                    categories: categories,
+                    rarities: rarities,
+                    search: "",
+                    categoryFilter: "",
+                    rarityFilter: ""
+                });
+
             });
 
         });
@@ -719,6 +741,18 @@ app.get('/search', checkAuthenticated, (req, res) => {
     const category = req.query.category || "";
     const rarity = req.query.rarity || "";
 
+    const sql = `
+    SELECT cards.*,
+           conditions.condition_name
+    FROM cards
+    LEFT JOIN conditions
+    ON cards.condition_id = conditions.condition_id
+    WHERE cards.user_id = ?
+    AND cards.card_name LIKE ?
+    AND cards.category LIKE ?
+    AND cards.rarity LIKE ?
+    ORDER BY date_added DESC
+    `;
 
     const categorySql = `
         SELECT DISTINCT category
@@ -734,20 +768,6 @@ app.get('/search', checkAuthenticated, (req, res) => {
         WHERE user_id = ?
         ORDER BY rarity
     `;
-
-
-    const sql = `
-    SELECT cards.*,
-           conditions.condition_name
-    FROM cards
-    LEFT JOIN conditions
-    ON cards.condition_id = conditions.condition_id
-    WHERE cards.user_id = ?
-    AND cards.card_name LIKE ?
-    AND cards.category LIKE ?
-    AND cards.rarity LIKE ?
-    ORDER BY date_added DESC
-`;
 
     connection.query(categorySql, [userId], (err, categories) => {
 

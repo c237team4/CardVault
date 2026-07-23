@@ -62,6 +62,7 @@ h4 { color: #f2ede1; }
 
             <div class="row g-3">
 
+
                 <!-- Search -->
                 <div class="col-md-4">
 
@@ -75,14 +76,19 @@ h4 { color: #f2ede1; }
                 </div>
 
 
-                <!-- Category -->
+
+                <!-- Category Filter -->
                 <div class="col-md-3">
 
-                    <select name="category" class="form-select">
+                    <select 
+                        name="category" 
+                        class="form-select"
+                        onchange="this.form.submit()">
 
                         <option value="">
                             All Categories
                         </option>
+
 
                         <% if (typeof categories !== 'undefined') { %>
 
@@ -90,7 +96,7 @@ h4 { color: #f2ede1; }
 
                                 <option
                                     value="<%= category.category %>"
-                                    <%= categoryFilter === category.category ? 'selected' : '' %>>
+                                    <%= typeof categoryFilter !== 'undefined' && categoryFilter === category.category ? 'selected' : '' %>>
 
                                     <%= category.category %>
 
@@ -100,49 +106,39 @@ h4 { color: #f2ede1; }
 
                         <% } %>
 
+
                     </select>
 
                 </div>
 
-
-                <!-- Rarity -->
-                <div class="col-md-3">
-
-                    <select name="rarity" class="form-select">
-
-                        <option value="">
-                            All Rarities
-                        </option>
-
+                <!-- Rarity Filter -->
+                 <div class="col-md-3">
+                    <select name="rarity" class="form-select" onchange="this.form.submit()">
+                        <option value=""> All Rarities</option>
                         <% if (typeof rarities !== 'undefined') { %>
-
                             <% rarities.forEach(rarity => { %>
 
-                                <option
-                                    value="<%= rarity.rarity %>"
-                                    <%= rarityFilter === rarity.rarity ? 'selected' : '' %>>
+                <option value="<%= rarity.rarity %>"
+                    <%= typeof rarityFilter !== 'undefined' && rarityFilter === rarity.rarity ? 'selected' : '' %>>
+                    <%= rarity.rarity %>
+                </option>
+                
+                <% }) %>
+                <% } %>
+            </select>
+        </div>
 
-                                    <%= rarity.rarity %>
-
-                                </option>
-
-                            <% }) %>
-
-                        <% } %>
-
-                    </select>
-
-                </div>
-
-
-                <!-- Button -->
+                <!-- Search Button -->
                 <div class="col-md-2 d-grid">
 
                     <button type="submit" class="btn btn-dark">
+
                         Search
+
                     </button>
 
                 </div>
+
 
             </div>
 
@@ -152,7 +148,9 @@ h4 { color: #f2ede1; }
 
 </div>
 
-        <% if(cards.length > 0){ %>
+
+
+<% if(cards.length > 0){ %>
 
         <div class="row g-4">
 
