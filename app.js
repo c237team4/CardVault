@@ -1145,7 +1145,6 @@ app.get('/wishlist', checkAuthenticated, (req, res) => {
         res.render('wishlist', {
             user: req.session.user,
             wishlist: results,
-            messages: req.flash('success')
         });
     });
 });
