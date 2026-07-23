@@ -1082,6 +1082,88 @@ app.post('/admin/add-meetup', checkAuthenticated, checkAdmin, (req, res) => {
 // -----------------------------------------------------------------------------
 
 // =============================================================================
+// WISHLIST  --  private per-user "grail cards" a member is hunting for.
+// Owner: wishlist team.  Each user sees ONLY their own wishlist.
+// =============================================================================
+
+// READ — show the logged-in user's wishlist
+app.get('/wishlist', checkAuthenticated, (req, res) => {
+    const userId = req.session.user.user_id;
+    const sql = 'SELECT * FROM wishlist WHERE user_id = ? ORDER BY date_added DESC';
+    connection.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error('Error loading wishlist:', err);
+            return res.status(500).send('Database error');
+        }
+        res.render('wishlist', {
+            user: req.session.user,
+            wishlist: results,
+            messages: req.flash('success')
+        });
+    });
+});
+
+// CREATE — show the add form
+app.get('/add-wishlist', checkAuthenticated, (req, res) => {
+    res.render('add-wishlist', { user: req.session.user, messages: req.flash('error') });
+});
+
+// CREATE — handle the add submission
+app.post('/add-wishlist', checkAuthenticated, (req, res) => {
+    const userId = req.session.user.user_id;
+    const { card_name, category, target_price, notes } = req.body;
+
+    // card_name and category are required; target_price and notes are optional.
+    if (!card_name || !category) {
+        req.flash('error', 'Card name and category are required.');
+        return res.redirect('/add-wishlist');
+    }
+
+    const sql = `INSERT INTO wishlist (user_id, card_name, category, target_price, notes)
+                 VALUES (?, ?, ?, ?, ?)`;
+    connection.query(sql,
+        [userId, card_name, category, target_price || null, notes || null],
+        (err, result) => {
+            if (err) {
+                console.error('Error adding to wishlist:', err);
+                return res.status(500).send('Error adding to wishlist');
+            }
+            req.flash('success', 'Card added to your wishlist!');
+            res.redirect('/wishlist');
+        });
+});
+
+// DELETE — show the confirmation page
+app.get('/remove-wishlist/:id', checkAuthenticated, (req, res) => {
+    const userId = req.session.user.user_id;
+    const sql = 'SELECT * FROM wishlist WHERE wishlist_id = ? AND user_id = ?';
+    connection.query(sql, [req.params.id, userId], (err, results) => {
+        if (err) {
+            console.error('Error loading wishlist item:', err);
+            return res.status(500).send('Database error');
+        }
+        if (results.length === 0) {
+            return res.redirect('/wishlist');   // not theirs, or doesn't exist
+        }
+        res.render('remove-wishlist', { user: req.session.user, item: results[0] });
+    });
+});
+
+// DELETE — handle the removal
+app.post('/remove-wishlist/:id', checkAuthenticated, (req, res) => {
+    const userId = req.session.user.user_id;
+    const sql = 'DELETE FROM wishlist WHERE wishlist_id = ? AND user_id = ?';
+    connection.query(sql, [req.params.id, userId], (err, result) => {
+        if (err) {
+            console.error('Error removing from wishlist:', err);
+            return res.status(500).send('Error removing from wishlist');
+        }
+        req.flash('success', 'Card removed from your wishlist.');
+        res.redirect('/wishlist');
+    });
+});
+
+// =============================================================================
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
