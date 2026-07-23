@@ -1,27 +1,121 @@
 <%- include('partials/header', { title: 'Edit Meetup - CardVault' }) %>
 
-<!-- ============================================================
-     EDIT MEETUP  |  Owner: Ryan (Student B) - Update
-     Admin edits an existing meetup. Form comes pre-filled.
-     Posts to: POST /admin/edit-meetup/:id
-     ============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<div class="container my-5">
-  <div class="row justify-content-center">
-    <div class="col-12 col-md-8 col-lg-6">
-      <div class="card shadow border-0">
-        <div class="card-header bg-dark text-white">
-          <h4 class="mb-0">Edit Meetup Schedule</h4>
-        </div>
-        <div class="card-body">
-
-          <% if (messages && messages.length > 0) { %>
-            <div class="alert alert-danger">
-              <% messages.forEach(function(msg){ %>
-                <div><%= msg %></div>
-              <% }); %>
+     <style>
+      /* ===== CardVault vault theme — Edit Meetup (styling only) ===== */
+      body {
+        background: #0a0c12;
+        color: #d8dae0;
+      }
+    
+      .container.my-5 .card {
+        background: linear-gradient(160deg, #12151d 0%, #0d1016 100%);
+        border: 1px solid rgba(203, 166, 95, 0.28) !important;
+        border-radius: 14px;
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55) !important;
+        overflow: hidden;
+      }
+    
+      .container.my-5 .card-header {
+        background: transparent !important;
+        border-bottom: 1px solid rgba(203, 166, 95, 0.2);
+        padding: 1.4rem 1.5rem;
+      }
+      .container.my-5 .card-header h4 {
+        font-family: 'Instrument Serif', Georgia, serif;
+        font-weight: 400;
+        font-size: 1.9rem;
+        letter-spacing: 0.4px;
+        color: #f4f2ee !important;
+      }
+    
+      .container.my-5 .card-body { padding: 1.75rem; }
+    
+      /* Form labels & fields */
+      .container.my-5 .form-label {
+        color: #c3c6cf;
+        letter-spacing: 0.3px;
+      }
+      .container.my-5 .form-control {
+        background: #0b0e14;
+        border: 1px solid rgba(203, 166, 95, 0.2);
+        color: #e8e9ee;
+        border-radius: 8px;
+      }
+      .container.my-5 .form-control::placeholder { color: #6a6e78; }
+      .container.my-5 .form-control:focus {
+        background: #0b0e14;
+        border-color: #cba65f;
+        box-shadow: 0 0 0 0.2rem rgba(203, 166, 95, 0.18);
+        color: #f4f2ee;
+      }
+      .container.my-5 .form-control[type="date"]::-webkit-calendar-picker-indicator,
+      .container.my-5 .form-control[type="time"]::-webkit-calendar-picker-indicator {
+        filter: invert(0.7) sepia(1) saturate(2) hue-rotate(3deg);
+        cursor: pointer;
+      }
+    
+      /* Error alert */
+      .container.my-5 .alert-danger {
+        background: rgba(200, 90, 84, 0.12);
+        border: 1px solid rgba(200, 90, 84, 0.4);
+        color: #f0b6b2;
+        border-radius: 8px;
+      }
+    
+      /* Buttons */
+      .container.my-5 .btn-success {
+        background: linear-gradient(180deg, #e0bf7c 0%, #cba65f 100%);
+        border: none;
+        color: #0a0c12;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        border-radius: 8px;
+        padding: 0.55em 1.4em;
+        box-shadow: 0 6px 18px rgba(203, 166, 95, 0.25);
+      }
+      .container.my-5 .btn-success:hover {
+        background: linear-gradient(180deg, #ecca88 0%, #d9b46e 100%);
+        color: #0a0c12;
+      }
+      .container.my-5 .btn-secondary {
+        background: transparent;
+        border: 1px solid rgba(216, 218, 224, 0.25);
+        color: #b7bac2;
+        border-radius: 8px;
+        padding: 0.55em 1.3em;
+      }
+      .container.my-5 .btn-secondary:hover {
+        background: rgba(216, 218, 224, 0.08);
+        color: #f4f2ee;
+        border-color: rgba(216, 218, 224, 0.4);
+      }
+    </style>
+    
+    <div class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+          <div class="card shadow border-0">
+            <div class="card-header bg-dark text-white">
+              <h4 class="mb-0">Edit Meetup Schedule</h4>
             </div>
-          <% } %>
+            <div class="card-body">
+    
+              <% if (messages && messages.length > 0) { %>
+                <div class="alert alert-danger">
+                  <% messages.forEach(function(msg){ %>
+                    <div><%= msg %></div>
+                  <% }); %>
+                </div>
+              <% } %>
+
+<!-- ============================================================
+EDIT MEETUP  |  Owner: Ryan (Student B) - Update
+Admin edits an existing meetup. Form comes pre-filled.
+Posts to: POST /admin/edit-meetup/:id
+============================================================ -->
 
           <form action="/admin/edit-meetup/<%= meetup.meetup_id %>" method="POST">
 
