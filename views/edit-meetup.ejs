@@ -1,0 +1,77 @@
+<%- include('partials/header', { title: 'Edit Meetup - CardVault' }) %>
+
+<!-- ============================================================
+     EDIT MEETUP  |  Owner: Ryan (Student B) - Update
+     Admin edits an existing meetup. Form comes pre-filled.
+     Posts to: POST /admin/edit-meetup/:id
+     ============================================================ -->
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white">
+          <h4 class="mb-0">Edit Meetup Schedule</h4>
+        </div>
+        <div class="card-body">
+
+          <% if (messages && messages.length > 0) { %>
+            <div class="alert alert-danger">
+              <% messages.forEach(function(msg){ %>
+                <div><%= msg %></div>
+              <% }); %>
+            </div>
+          <% } %>
+
+          <form action="/admin/edit-meetup/<%= meetup.meetup_id %>" method="POST">
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Title</label>
+              <input type="text" class="form-control" name="title"
+                     value="<%= meetup.title %>" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Location</label>
+              <input type="text" class="form-control" name="location"
+                     value="<%= meetup.location %>" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Date</label>
+              <input type="date" class="form-control" name="meetup_date"
+                     value="<%= meetup.meetup_date %>" required>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Start Time</label>
+                <input type="time" class="form-control" name="start_time"
+                       value="<%= meetup.start_time %>">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">End Time</label>
+                <input type="time" class="form-control" name="end_time"
+                       value="<%= meetup.end_time %>">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Description</label>
+              <textarea class="form-control" name="description" rows="3"><%= meetup.description %></textarea>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+              <a href="/meetups" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-success">Save Changes</button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
