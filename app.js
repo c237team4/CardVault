@@ -297,7 +297,19 @@ app.get('/meetups', checkAuthenticated, (req, res) => {
     });
 });
 
-
+// DELETE a meetup (admin only). POST, not a link, so it can't be
+// triggered accidentally or by a crawler following an <a href>.
+app.post('/admin/delete-meetup/:id', checkAuthenticated, checkAdmin, (req, res) => {
+    const sql = 'DELETE FROM meetups WHERE meetup_id = ?';
+    connection.query(sql, [req.params.id], (err, result) => {
+        if (err) {
+            console.error('Error deleting meetup:', err);
+            return res.status(500).send('Error deleting meetup');
+        }
+        req.flash('success', 'Meetup deleted successfully!');
+        res.redirect('/meetups');
+    });
+});
 
 // -----------------------------------------------------------------------------
 // STUDENT B  |  Owner: Ryan
