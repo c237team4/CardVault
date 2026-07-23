@@ -384,6 +384,62 @@ app.post('/add-card', checkAuthenticated, upload.single('image'), (req, res) => 
 });
 
 // -----------------------------------------------------------------------------
+// MEETUP: Edit schedule (Update)  --  Ryan (Student B)
+// Admin edits an existing meetup. Members see the change on /meetups.
+// -----------------------------------------------------------------------------
+
+// Show the edit form, pre-filled with the meetup's current values
+app.get('/admin/edit-meetup/:id', checkAuthenticated, checkAdmin, (req, res) => {
+    // Format date/time to match what the <input type="date"> / <input type="time">
+    // fields expect: 'YYYY-MM-DD' and 'HH:MM'. Otherwise the boxes come up blank.
+    const sql = `
+        SELECT meetup_id, title, location,
+               DATE_FORMAT(meetup_date, '%Y-%m-%d') AS meetup_date,
+               TIME_FORMAT(start_time, '%H:%i')     AS start_time,
+               TIME_FORMAT(end_time, '%H:%i')       AS end_time,
+               description
+        FROM meetups
+        WHERE meetup_id = ?
+    `;
+    connection.query(sql, [req.params.id], (err, results) => {
+        if (err) {
+            console.error('Error loading meetup:', err);
+            return res.status(500).send('Database error');
+        }
+        if (results.length === 0) {
+            return res.status(404).send('Meetup not found');
+        }
+        res.render('edit-meetup', { meetup: results[0], messages: req.flash('error') });
+    });
+});
+
+// Handle the edit submission
+app.post('/admin/edit-meetup/:id', checkAuthenticated, checkAdmin, (req, res) => {
+    const { title, location, meetup_date, start_time, end_time, description } = req.body;
+
+    if (!title || !location || !meetup_date) {
+        req.flash('error', 'Title, location and date are required.');
+        return res.redirect('/admin/edit-meetup/' + req.params.id);
+    }
+
+    const sql = `
+        UPDATE meetups
+        SET title = ?, location = ?, meetup_date = ?, start_time = ?, end_time = ?, description = ?
+        WHERE meetup_id = ?
+    `;
+    connection.query(sql,
+        [title, location, meetup_date, start_time || null, end_time || null, description || null, req.params.id],
+        (err, result) => {
+            if (err) {
+                console.error('Error updating meetup:', err);
+                return res.status(500).send('Error updating meetup');
+            }
+            req.flash('success', 'Meetup updated successfully!');
+            res.redirect('/meetups');
+        });
+});
+
+// -----------------------------------------------------------------------------
 // STUDENT C  |  Owner: Sammi
 // Viewing and Displaying Information
 // -----------------------------------------------------------------------------
