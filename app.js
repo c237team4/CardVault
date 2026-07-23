@@ -271,6 +271,33 @@ app.post('/forgot-password', validateReset, (req, res) => {
 });
 
 
+// -----------------------------------------------------------------------------
+// MEETUP: Member schedule page (Read)  --  Tan Boon Meng (Student A)
+// Any logged-in member can view upcoming meetups. The view shows the nearest
+// as a big featured card and the next few as small cards (views/meetups.ejs).
+// -----------------------------------------------------------------------------
+app.get('/meetups', checkAuthenticated, (req, res) => {
+    // Upcoming meetups only, soonest first. CURDATE() is today's date in MySQL,
+    // so past events drop off automatically.
+    const sql = `
+        SELECT meetup_id, title, location, description,
+               DATE_FORMAT(meetup_date, '%W, %d %b %Y') AS date_display,
+               TIME_FORMAT(start_time, '%h:%i %p')      AS start_display,
+               TIME_FORMAT(end_time, '%h:%i %p')        AS end_display
+        FROM meetups
+        WHERE meetup_date >= CURDATE()
+        ORDER BY meetup_date ASC
+    `;
+    connection.query(sql, (err, meetups) => {
+        if (err) {
+            console.error('Error loading meetups:', err);
+            return res.status(500).send('Database error');
+        }
+        res.render('meetups', { user: req.session.user, meetups: meetups });
+    });
+});
+
+
 
 // -----------------------------------------------------------------------------
 // STUDENT B  |  Owner: Ryan

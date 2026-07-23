@@ -206,6 +206,34 @@ INSERT INTO conditions (condition_name, condition_rank) VALUES
     ('Poor', 6);
 
 -- =============================================================================
+-- meetups  --  owner: meetup team (Ryan, Zhan Fung, Boon Meng)
+--
+-- Monthly community meetups posted by the admin. Members view the schedule;
+-- the app only schedules and informs -- the actual card-sharing happens in
+-- person at the event.
+--   Admin: create / edit / delete.   Members: view only.
+-- =============================================================================
+
+DROP TABLE IF EXISTS meetups;
+CREATE TABLE meetups (
+    meetup_id   INT AUTO_INCREMENT PRIMARY KEY,
+    title       VARCHAR(100) NOT NULL,      -- "Orchard Card Meetup"
+    location    VARCHAR(150) NOT NULL,      -- "The Heeren (B1-01, 260 Orchard Rd)"
+    meetup_date DATE NOT NULL,
+    start_time  TIME,                        -- when it opens
+    end_time    TIME,                        -- when it closes
+    description VARCHAR(255),               -- theme / what to bring
+    created_at  DATE NOT NULL DEFAULT (CURRENT_DATE)
+);
+
+INSERT INTO meetups (title, location, meetup_date, start_time, end_time, description) VALUES
+    ('Orchard Card Meetup', 'The Heeren (B1-01, 260 Orchard Rd)', '2026-08-02', '11:00:00', '21:00:00', 'Monthly trade & showcase. Bring your binders.'),
+    ('Kallang Collectors Day', 'Leisure Park Kallang (Level 1 Atrium)', '2026-08-23', '11:00:00', '21:00:00', 'Trading card focus. Graded slabs welcome.'),
+    ('Raffles Place Card Exchange', 'Raffles Place (MRT B1)', '2026-09-13', '10:00:00', '20:00:00', 'City-centre meetup for all collectors.'),
+    ('*SCAPE Collectors Gathering', '*SCAPE (Level 5, Treetop)', '2026-10-11', '11:00:00', '21:00:00', 'Our biggest meetup yet - all genres.');
+
+
+-- =============================================================================
 -- wishlist  --  cards a user wants but doesn't own yet
 -- =============================================================================
 --
@@ -246,4 +274,3 @@ CREATE TABLE wishlist (
 
     FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
-
