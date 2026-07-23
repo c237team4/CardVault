@@ -205,7 +205,6 @@ INSERT INTO conditions (condition_name, condition_rank) VALUES
     ('Played', 5),
     ('Poor', 6);
 
-
 -- =============================================================================
 -- meetups  --  owner: meetup team (Ryan, Zhan Fung, Boon Meng)
 --
@@ -235,23 +234,43 @@ INSERT INTO meetups (title, location, meetup_date, start_time, end_time, descrip
 
 
 -- =============================================================================
--- wishlist  --  owner: wishlist team (Sammi, Ezann, Rainie)
---
--- Cards a collector WANTS but does not own yet ("grail cards"). Private per
--- user, exactly like the collection -- every query filters WHERE user_id = ?.
---   Each user: create / view / edit / delete their own wishes.
+-- wishlist  --  cards a user wants but doesn't own yet
 -- =============================================================================
+--
+-- Design decisions:
+--
+--   category is FREE TEXT, same reasoning as cards.category
+--     'Pokemon', 'NBA', etc. No fixed vocabulary, so no franchise is ever
+--     blocked. Kept consistent with how cards.category works.
+--
+--   No genre_id, condition_id, rarity, quantity, or estimated_value
+--     Those describe a card you physically hold. A wishlist entry is just
+--     "the card I want" -- condition and quantity don't apply until it's
+--     actually bought and moved into the cards table.
+--
+--   target_price is NULLABLE
+--     Not every wishlist entry has a price ceiling in mind yet ("the grail,
+--     one day" with no real budget is a valid entry).
+--
+--   notes, nullable free text
+--     e.g. grading requirements, edition preferences -- same role as
+--     cards.remarks.
+--
+--   ON DELETE CASCADE on user_id
+--     Same reasoning as cards: delete a user, their wishlist goes with them.
+--     No orphaned rows left pointing at a user_id that no longer exists.
+-- -----------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS wishlist;
-CREATE TABLE wishlist (
-    wishlist_id  INT AUTO_INCREMENT PRIMARY KEY,
-    user_id      INT NOT NULL,
-    card_name    VARCHAR(100) NOT NULL,
-    category     VARCHAR(50),                 -- free text, like cards.category
-    target_price DECIMAL(10,2),               -- what they would pay
-    notes        VARCHAR(255),
-    date_added   DATE NOT NULL DEFAULT (CURRENT_DATE),
 
-    -- Private per user; delete a user and their wishes go too (no orphans).
+CREATE TABLE wishlist (
+    wishlist_id   INT AUTO_INCREMENT PRIMARY KEY,
+    user_id       INT NOT NULL,
+    card_name     VARCHAR(100) NOT NULL,
+    category      VARCHAR(50) NOT NULL,
+    target_price  DECIMAL(10,2) DEFAULT NULL,
+    notes         VARCHAR(255) DEFAULT NULL,
+    date_added    DATE NOT NULL DEFAULT (CURRENT_DATE),
+
     FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
