@@ -1,0 +1,70 @@
+<%- include('partials/header', { title: 'Edit Review - CardVault' }) %>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body { background: #0a0c12; font-family: Archivo, system-ui, sans-serif; }
+.bg-light { background: radial-gradient(120% 100% at 50% 0%, #181d2e 0%, #0e1119 55%, #0a0c12 100%) !important; }
+h1 { font-family: 'Instrument Serif', serif; font-weight: 400 !important; }
+h1.text-dark { color: #f2ede1 !important; }
+.text-secondary { color: #8a90a4 !important; }
+.card { background: #12151e; border: 1px solid rgba(203,166,95,.25) !important; }
+.shadow-lg { box-shadow: 0 24px 60px rgba(0,0,0,.55) !important; }
+.form-control { background: #0e1119; border: 1px solid rgba(203,166,95,.25); color: #d8dce8; }
+.form-control:focus { background: #0e1119; border-color: #cba65f; color: #d8dce8; box-shadow: 0 0 0 .2rem rgba(203,166,95,.15); }
+.btn-primary { background: linear-gradient(180deg, #e0bf7c, #c9a35c); border: none; color: #1c1508; font-weight: 600; }
+.btn-primary:hover { background: linear-gradient(180deg, #e8c988, #d3ad64); color: #1c1508; }
+.btn-outline-dark { border: 1px solid rgba(203,166,95,.55); color: #cba65f; }
+.btn-outline-dark:hover { background: rgba(214,179,106,.15); border-color: #cba65f; color: #e0bf7c; }
+.current-image { max-height: 200px; object-fit: contain; border-radius: 8px; border: 1px solid rgba(203,166,95,.25); }
+</style>
+
+<div class="bg-light min-vh-100 py-5">
+
+    <div class="container">
+
+        <h1 class="fw-bold text-dark mb-5">Edit Review</h1>
+
+        <div class="card border-0 shadow-lg rounded-4">
+            <div class="card-body p-5">
+                <form action="/edit-review/<%= review.review_id %>" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="meetup_id" value="<%= review.meetup_id %>">
+                    <input type="hidden" name="existing_image" value="<%= review.image %>">
+                    <input type="hidden" name="category" value="Reviews">
+
+                    <div class="mb-3">
+                        <label class="text-secondary mb-1">Rating (1-5)</label>
+                        <input type="number" name="rating" class="form-control" min="1" max="5" value="<%= review.rating %>" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-secondary mb-1">Comment</label>
+                        <textarea name="comment" class="form-control" rows="3"><%= review.comment %></textarea>
+                    </div>
+
+                    <% if (review.image) { %>
+                        <div class="mb-3">
+                            <label class="text-secondary mb-1 d-block">Current photo</label>
+                            <img src="/images/<%= review.image %>" alt="Current review photo" class="current-image">
+                        </div>
+                    <% } %>
+
+                    <div class="mb-4">
+                        <label class="text-secondary mb-1">Replace photo (optional — leave blank to keep current)</label>
+                        <input type="file" name="image" class="form-control" accept="image/*">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">Update Review</button>
+                        <a href="/meetup/<%= review.meetup_id %>" class="btn btn-outline-dark px-4">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<%- include('partials/footer') %>
+

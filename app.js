@@ -576,16 +576,18 @@ app.get('/card/:id', checkAuthenticated, (req, res) => {
 
 // -----------------------------------------------------------------------------
 // STUDENT D  |  Owner: Ezann
-// Editing Existing Information
+// Editing Existing Information + Reviews & Ratings
 // Routes: GET /edit-card/:id, POST /edit-card/:id
+//         GET /meetup-reviews, GET /meetup/:id, POST /meetup/:id/reviews,
+//         GET /edit-review/:id, POST /edit-review/:id, POST /delete-review/:id
 // -----------------------------------------------------------------------------
-
+ 
 // Show edit form pre-filled with the card's current data
 app.get('/edit-card/:id', checkAuthenticated, (req, res) => {
-
+ 
     const cardId = req.params.id;
     const userId = req.session.user.user_id;
-
+ 
     const sql = `
         SELECT cards.*,
                conditions.condition_name
@@ -595,35 +597,35 @@ app.get('/edit-card/:id', checkAuthenticated, (req, res) => {
         WHERE cards.card_id = ?
         AND cards.user_id = ?
     `;
-
+ 
     connection.query(sql, [cardId, userId], (err, results) => {
-
+ 
         if (err) {
             console.error(err);
             return res.status(500).send('Database error');
         }
-
+ 
         if (results.length === 0) {
             req.flash('error', 'Card not found or you do not have permission to edit it.');
             return res.redirect('/dashboard');
         }
-
+ 
         res.render('edit-card', {
             user: req.session.user,
             card: results[0],
             messages: req.flash('error')
         });
-
+ 
     });
-
+ 
 });
-
+ 
 // Process the edit form (image upload is optional -- keep the old image if none is chosen)
 app.post('/edit-card/:id', checkAuthenticated, upload.single('image'), (req, res) => {
-
+ 
     const cardId = req.params.id;
     const userId = req.session.user.user_id;
-
+ 
     const {
         card_name,
         genre_id,
@@ -636,7 +638,7 @@ app.post('/edit-card/:id', checkAuthenticated, upload.single('image'), (req, res
         purchase_price,
         existing_image   // hidden field in the form holding the current image path
     } = req.body;
-
+ 
     // Work out the image value the same way add-card does
     let dbImageValue = existing_image || 'default.png';
     if (req.file) {
@@ -646,7 +648,7 @@ app.post('/edit-card/:id', checkAuthenticated, upload.single('image'), (req, res
         }
         dbImageValue = `${folderName}/${req.file.originalname}`;
     }
-
+ 
     const sql = `
         UPDATE cards
         SET card_name = ?,
@@ -662,7 +664,7 @@ app.post('/edit-card/:id', checkAuthenticated, upload.single('image'), (req, res
         WHERE card_id = ?
         AND user_id = ?
     `;
-
+ 
     const values = [
         card_name,
         genre_id,
@@ -677,27 +679,171 @@ app.post('/edit-card/:id', checkAuthenticated, upload.single('image'), (req, res
         cardId,
         userId
     ];
-
+ 
     connection.query(sql, values, (err, result) => {
-
+ 
         if (err) {
             console.error('Database Error details:', err);
             req.flash('error', 'Failed to update card. Please try again.');
             return res.redirect('/edit-card/' + cardId);
         }
-
+ 
         if (result.affectedRows === 0) {
             req.flash('error', 'Card not found or you do not have permission to edit it.');
             return res.redirect('/dashboard');
         }
-
+ 
         req.flash('success', 'Card updated successfully!');
         res.redirect('/card/' + cardId);
     });
-
+ 
 });
-
-
+ 
+// READ — list all meetups with a "Leave a Review" link (own hub page, doesn't touch meetups.ejs)
+app.get('/meetup-reviews', checkAuthenticated, (req, res) => {
+    const sql = `
+        SELECT meetup_id, title, location,
+               DATE_FORMAT(meetup_date, '%W, %d %b %Y') AS date_display
+        FROM meetups
+        ORDER BY meetup_date DESC
+    `;
+    connection.query(sql, (err, meetups) => {
+        if (err) {
+            console.error('Error loading meetups:', err);
+            return res.status(500).send('Database error');
+        }
+        res.render('meetup-reviews', { user: req.session.user, meetups: meetups });
+    });
+});
+ 
+// READ — view one meetup's details + all its reviews + the review form
+app.get('/meetup/:id', checkAuthenticated, (req, res) => {
+    const meetupId = req.params.id;
+ 
+    const meetupSql = `
+        SELECT meetup_id, title, location, description,
+               DATE_FORMAT(meetup_date, '%W, %d %b %Y') AS date_display,
+               TIME_FORMAT(start_time, '%h:%i %p')      AS start_display,
+               TIME_FORMAT(end_time, '%h:%i %p')        AS end_display
+        FROM meetups
+        WHERE meetup_id = ?
+    `;
+    connection.query(meetupSql, [meetupId], (err, meetupResults) => {
+        if (err) {
+            console.error('Error loading meetup:', err);
+            return res.status(500).send('Database error');
+        }
+        if (meetupResults.length === 0) {
+            return res.status(404).send('Meetup not found');
+        }
+ 
+        const reviewsSql = `
+            SELECT reviews.*, users.username
+            FROM reviews
+            JOIN users ON reviews.user_id = users.user_id
+            WHERE reviews.meetup_id = ?
+            ORDER BY reviews.created_at DESC
+        `;
+        connection.query(reviewsSql, [meetupId], (err, reviewResults) => {
+            if (err) {
+                console.error('Error loading reviews:', err);
+                return res.status(500).send('Database error');
+            }
+ 
+            res.render('view-meetup', {
+                user: req.session.user,
+                meetup: meetupResults[0],
+                reviews: reviewResults,
+                messages: req.flash('error')
+            });
+        });
+    });
+});
+ 
+// CREATE — submit a new review for a meetup (photo optional)
+app.post('/meetup/:id/reviews', checkAuthenticated, upload.single('image'), (req, res) => {
+    const meetupId = req.params.id;
+    const userId = req.session.user.user_id;
+    const { rating, comment } = req.body;
+ 
+    if (!rating) {
+        req.flash('error', 'Rating is required.');
+        return res.redirect('/meetup/' + meetupId);
+    }
+ 
+    let dbImageValue = null;
+    if (req.file) {
+        dbImageValue = `Reviews/${req.file.originalname}`;
+    }
+ 
+    const sql = 'INSERT INTO reviews (user_id, meetup_id, rating, comment, image) VALUES (?, ?, ?, ?, ?)';
+    connection.query(sql, [userId, meetupId, rating, comment || null, dbImageValue], (err, result) => {
+        if (err) {
+            console.error('Error adding review:', err);
+            return res.status(500).send('Error adding review');
+        }
+        req.flash('success', 'Review submitted!');
+        res.redirect('/meetup/' + meetupId);
+    });
+});
+ 
+// UPDATE — show edit form for a review the user owns
+app.get('/edit-review/:id', checkAuthenticated, (req, res) => {
+    const reviewId = req.params.id;
+    const userId = req.session.user.user_id;
+ 
+    const sql = 'SELECT * FROM reviews WHERE review_id = ? AND user_id = ?';
+    connection.query(sql, [reviewId, userId], (err, results) => {
+        if (err) {
+            console.error('Error loading review:', err);
+            return res.status(500).send('Database error');
+        }
+        if (results.length === 0) {
+            req.flash('error', 'Review not found or you do not have permission to edit it.');
+            return res.redirect('/meetup-reviews');
+        }
+        res.render('edit-review', { user: req.session.user, review: results[0] });
+    });
+});
+ 
+// UPDATE — handle the edit submission (photo optional -- keep the old one if none is chosen)
+app.post('/edit-review/:id', checkAuthenticated, upload.single('image'), (req, res) => {
+    const reviewId = req.params.id;
+    const userId = req.session.user.user_id;
+    const { rating, comment, meetup_id, existing_image } = req.body;
+ 
+    let dbImageValue = existing_image || null;
+    if (req.file) {
+        dbImageValue = `Reviews/${req.file.originalname}`;
+    }
+ 
+    const sql = 'UPDATE reviews SET rating = ?, comment = ?, image = ? WHERE review_id = ? AND user_id = ?';
+    connection.query(sql, [rating, comment || null, dbImageValue, reviewId, userId], (err, result) => {
+        if (err) {
+            console.error('Error updating review:', err);
+            return res.status(500).send('Error updating review');
+        }
+        req.flash('success', 'Review updated!');
+        res.redirect('/meetup/' + meetup_id);
+    });
+});
+ 
+// DELETE — remove a review the user owns
+app.post('/delete-review/:id', checkAuthenticated, (req, res) => {
+    const reviewId = req.params.id;
+    const userId = req.session.user.user_id;
+    const meetupId = req.body.meetup_id;
+ 
+    const sql = 'DELETE FROM reviews WHERE review_id = ? AND user_id = ?';
+    connection.query(sql, [reviewId, userId], (err, result) => {
+        if (err) {
+            console.error('Error deleting review:', err);
+            return res.status(500).send('Error deleting review');
+        }
+        req.flash('success', 'Review deleted.');
+        res.redirect('/meetup/' + meetupId);
+    });
+});
 
 // -----------------------------------------------------------------------------
 // STUDENT E  |  Owner: Rainie

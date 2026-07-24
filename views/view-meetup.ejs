@@ -1,0 +1,111 @@
+<%- include('partials/header', { title: meetup.title + ' - CardVault' }) %>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body { background: #0a0c12; font-family: Archivo, system-ui, sans-serif; }
+.bg-light { background: radial-gradient(120% 100% at 50% 0%, #181d2e 0%, #0e1119 55%, #0a0c12 100%) !important; }
+h1, h2, h3 { font-family: 'Instrument Serif', serif; font-weight: 400 !important; }
+h1.text-dark, h2.text-dark, h3.text-dark { color: #f2ede1 !important; }
+.text-secondary { color: #8a90a4 !important; }
+.card { background: #12151e; border: 1px solid rgba(203,166,95,.25) !important; }
+.shadow-lg { box-shadow: 0 24px 60px rgba(0,0,0,.55) !important; }
+.card-body { color: #d8dce8; }
+.form-control, .form-select { background: #0e1119; border: 1px solid rgba(203,166,95,.25); color: #d8dce8; }
+.form-control:focus, .form-select:focus { background: #0e1119; border-color: #cba65f; color: #d8dce8; box-shadow: 0 0 0 .2rem rgba(203,166,95,.15); }
+.text-success { color: #cba65f !important; }
+.btn-primary { background: linear-gradient(180deg, #e0bf7c, #c9a35c); border: none; color: #1c1508; font-weight: 600; }
+.btn-primary:hover { background: linear-gradient(180deg, #e8c988, #d3ad64); color: #1c1508; }
+.btn-danger { background: transparent; border: 1px solid rgba(224,120,120,.5); color: #e8a0a0; }
+.btn-danger:hover { background: rgba(224,120,120,.12); border-color: #e8a0a0; color: #f2b8b8; }
+.btn-outline-dark { border: 1px solid rgba(203,166,95,.55); color: #cba65f; }
+.btn-outline-dark:hover { background: rgba(214,179,106,.15); border-color: #cba65f; color: #e0bf7c; }
+.review-item { border-bottom: 1px solid rgba(203,166,95,.15); padding: 1rem 0; }
+.review-item:last-child { border-bottom: none; }
+.review-item img { max-height: 220px; object-fit: contain; border-radius: 8px; border: 1px solid rgba(203,166,95,.2); }
+</style>
+
+<div class="bg-light min-vh-100 py-5">
+
+    <div class="container">
+
+        <div class="mb-5">
+            <h1 class="fw-bold text-dark mb-1"><%= meetup.title %></h1>
+            <p class="text-secondary mb-0">
+                <%= meetup.location %> &middot; <%= meetup.date_display %> &middot; <%= meetup.start_display %> - <%= meetup.end_display %>
+            </p>
+        </div>
+
+        <% if (messages.length > 0) { %>
+            <div class="alert alert-danger"><%= messages[0] %></div>
+        <% } %>
+
+        <div class="card border-0 shadow-lg rounded-4 mb-4">
+            <div class="card-body p-5">
+                <p><%= meetup.description %></p>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-lg rounded-4 mb-4">
+            <div class="card-body p-5">
+                <h2 class="fw-bold text-dark mb-4">Reviews</h2>
+
+                <% if (reviews.length === 0) { %>
+                    <p class="text-secondary">No reviews yet. Be the first to leave one!</p>
+                <% } %>
+
+                <% reviews.forEach(function(review) { %>
+                    <div class="review-item">
+                        <strong class="text-dark"><%= review.username %></strong>
+                        <span class="badge bg-warning text-dark px-3 py-2 ms-2"><%= review.rating %>/5</span>
+                        <p class="mt-2 mb-2"><%= review.comment %></p>
+
+                        <% if (review.image) { %>
+                            <img src="/images/<%= review.image %>" alt="Review photo" class="img-fluid mb-2 d-block">
+                        <% } %>
+
+                        <% if (user && user.user_id === review.user_id) { %>
+                            <a href="/edit-review/<%= review.review_id %>" class="btn btn-outline-dark btn-sm me-2">Edit</a>
+                            <form action="/delete-review/<%= review.review_id %>" method="POST" style="display:inline"
+                                  onsubmit="return confirm('Delete this review?');">
+                                <input type="hidden" name="meetup_id" value="<%= meetup.meetup_id %>">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        <% } %>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-lg rounded-4">
+            <div class="card-body p-5">
+                <h3 class="fw-bold text-dark mb-4">Leave a Review</h3>
+                <form action="/meetup/<%= meetup.meetup_id %>/reviews" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="category" value="Reviews">
+                    <div class="mb-3">
+                        <label class="text-secondary mb-1">Rating (1-5)</label>
+                        <input type="number" name="rating" class="form-control" min="1" max="5" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-secondary mb-1">Comment</label>
+                        <textarea name="comment" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-secondary mb-1">Photo (optional)</label>
+                        <input type="file" name="image" class="form-control" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary px-4">Submit Review</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="/meetup-reviews" class="btn btn-outline-dark px-4">← Back to Reviews</a>
+        </div>
+
+    </div>
+
+</div>
+
+<%- include('partials/footer') %>
+

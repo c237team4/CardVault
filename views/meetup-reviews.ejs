@@ -1,0 +1,61 @@
+<%- include('partials/header', { title: 'Reviews - CardVault' }) %>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  body { background: #0a0c12; color: #d8dae0; font-family: Archivo, system-ui, sans-serif; }
+  .container.my-5 h1.fw-bold {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-weight: 400 !important;
+    color: #f4f2ee;
+  }
+  .container.my-5 .text-muted { color: #8b8f9a !important; }
+  .container.my-5 .card {
+    background: linear-gradient(160deg, #12151d 0%, #0d1016 100%);
+    border: 1px solid rgba(203, 166, 95, 0.28) !important;
+    border-radius: 12px;
+  }
+  .container.my-5 .card-title { color: #f4f2ee; font-weight: 600; }
+  .container.my-5 .btn-success {
+    background: linear-gradient(180deg, #e0bf7c 0%, #cba65f 100%);
+    border: none;
+    color: #0a0c12;
+    font-weight: 600;
+    border-radius: 8px;
+  }
+  .container.my-5 .btn-success:hover {
+    background: linear-gradient(180deg, #ecca88 0%, #d9b46e 100%);
+    color: #0a0c12;
+  }
+</style>
+
+<div class="container my-5">
+
+  <div class="mb-5">
+    <h1 class="fw-bold">Meetup Reviews</h1>
+    <p class="text-muted">Pick a meetup to read or leave a review.</p>
+  </div>
+
+  <% if (meetups.length === 0) { %>
+    <p class="text-muted">No meetups found.</p>
+  <% } %>
+
+  <div class="row g-4">
+    <% meetups.forEach(function(m) { %>
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title"><%= m.title %></h5>
+            <p class="text-muted mb-1"><%= m.date_display %></p>
+            <p class="text-muted mb-3"><%= m.location %></p>
+            <a href="/meetup/<%= m.meetup_id %>" class="btn btn-success btn-sm">Leave a Review</a>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+
+</div>
+
+<%- include('partials/footer') %>
