@@ -1,4 +1,4 @@
-<%- include('partials/header', { title: 'Remove Collection Goal', user: user }) %>
+<%- include('partials/header', { title: 'Remove Collection Goal - CardVault', user: user }) %>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -9,6 +9,14 @@ body{
     color:#d8dae0;
 }
 
+.container.my-5 h1{
+    font-family:'Instrument Serif', Georgia, serif;
+    font-size:3.25rem;
+    font-weight:400;
+    color:#f4f2ee;
+    letter-spacing:-2px;
+}
+
 .goal-card{
     background:linear-gradient(160deg,#12151d 0%,#0d1016 100%);
     border:1px solid rgba(200,90,84,.35);
@@ -16,18 +24,33 @@ body{
     box-shadow:0 18px 48px rgba(0,0,0,.55);
 }
 
-h1{
-    font-family:'Instrument Serif',serif;
-    font-size:3rem;
+.goal-title{
+    font-family:'Instrument Serif', Georgia, serif;
+    font-size:2rem;
     color:#f4f2ee;
+    margin-bottom:15px;
 }
 
-h3{
-    color:#f4f2ee;
+.text-muted{
+    color:#9ca0ab !important;
+}
+
+.progress-text{
+    color:#d8dae0;
 }
 
 .text-warning{
     color:#e0bf7c !important;
+}
+
+.warning-box{
+    background:rgba(200,90,84,.08);
+    border:1px solid rgba(200,90,84,.35);
+    border-radius:10px;
+    color:#f2b5b2;
+    padding:15px;
+    margin-top:25px;
+    margin-bottom:30px;
 }
 
 .btn-delete{
@@ -35,57 +58,88 @@ h3{
     border:none;
     color:white;
     font-weight:600;
+    padding:10px 22px;
 }
 
 .btn-delete:hover{
     background:#b84b45;
+    color:white;
 }
 
 .btn-cancel{
+    background:transparent;
+    border:1px solid rgba(203,166,95,.45);
     color:#e0bf7c;
-    border:1px solid rgba(203,166,95,.5);
+    font-weight:600;
+    padding:10px 22px;
 }
 
 .btn-cancel:hover{
     background:rgba(203,166,95,.15);
-    color:white;
+    border-color:#cba65f;
+    color:#f4f2ee;
 }
 </style>
 
-<div class="container my-5" style="max-width:700px;">
+<div class="container my-5" style="max-width:720px;">
 
-<div class="goal-card p-5">
+    <div class="goal-card">
 
-<h1 class="mb-4">Remove Collection Goal</h1>
+        <div class="card-body p-5">
 
-<h3><%= goal.goal_name %></h3>
+            <h1 class="mb-4">
+                Delete Collection Goal
+            </h1>
 
-<p class="text-muted">
-<%= goal.description %>
-</p>
+            <h2 class="goal-title">
+                <%= goal.goal_name %>
+            </h2>
 
-<p>
-<strong class="text-warning">Progress:</strong>
-<%= goal.current_cards %> / <%= goal.target_cards %> cards
-</p>
+            <p class="text-muted">
+                <%= goal.description %>
+            </p>
 
-<p class="text-danger mt-4 mb-4">
-Are you sure you want to permanently delete this collection goal?
-</p>
+            <hr class="border-secondary">
 
-<form action="/remove-goal/<%= goal.goal_id %>" method="POST">
+            <p class="progress-text">
+                <strong class="text-warning">
+                    Progress
+                </strong>
 
-<button class="btn btn-delete">
-Delete Goal
-</button>
+                <br>
 
-<a href="/goals" class="btn btn-cancel ms-2">
-Cancel
-</a>
+                <%= goal.current_cards %> /
+                <%= goal.target_cards %> cards
+            </p>
 
-</form>
+            <div class="warning-box">
 
-</div>
+                <strong>
+                    ⚠ Warning
+                </strong>
+
+                <br><br>
+
+                This action will permanently delete this collection goal.
+                This cannot be undone.
+
+            </div>
+
+            <form action="/remove-goal/<%= goal.goal_id %>" method="POST">
+
+                <button type="submit" class="btn btn-delete">
+                    Delete Goal
+                </button>
+
+                <a href="/goals" class="btn btn-cancel ms-2">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
 
 </div>
 

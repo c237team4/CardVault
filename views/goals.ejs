@@ -1,6 +1,5 @@
 <%- include('partials/header', { title: 'Goal Collection - CardVault', user: user }) %>
 
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -31,11 +30,21 @@
     }
 
     .card {
-    background-color: #fcf8ee !important;
-    border: 1px solid lab(84.75% 0.35 40.36);
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,.15);
-}
+        background-color: #fcf8ee !important;
+        border: 1px solid rgba(203,166,95,.28);
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,.15);
+    }
+
+    .card h3 {
+        font-family: 'Instrument Serif', Georgia, serif;
+        font-weight: 400;
+        color: #202020;
+    }
+
+    .card p {
+        color: #2d2d2d;
+    }
 
     .btn-success {
         background: linear-gradient(180deg,#e0bf7c,#cba65f);
@@ -49,6 +58,43 @@
         color: #0a0c12;
     }
 
+    /* Same styling as Meetups page */
+    .btn-outline-primary {
+        color: #e0bf7c;
+        border-color: rgba(203,166,95,.5);
+        background: transparent;
+        border-radius: 7px;
+    }
+
+    .btn-outline-primary:hover {
+        background: rgba(203,166,95,.14);
+        color: #f4f2ee;
+        border-color: #cba65f;
+    }
+
+    .btn-outline-danger {
+        color: #d98a86;
+        border-color: rgba(200,90,84,.45);
+        background: transparent;
+        border-radius: 7px;
+    }
+
+    .btn-outline-danger:hover {
+        background: rgba(200,90,84,.15);
+        color: #f0b6b2;
+        border-color: #c85a54;
+    }
+
+    .badge.bg-primary {
+    background: rgba(100, 140, 225, 0.18) !important;
+    color: #4d6fb8 !important;
+    border: 1px solid rgba(100, 140, 225, 0.45);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 6px 12px;
+    border-radius: 999px;
+}
+
     .empty-message {
         background: rgba(203,166,95,.08);
         border: 1px solid rgba(203,166,95,.28);
@@ -56,107 +102,95 @@
         border-radius: 10px;
         padding: 18px;
     }
-
-
 </style>
-
 
 <div class="container my-5">
 
-<div class="d-flex justify-content-between align-items-center mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
 
-    <div class="goal-card">
+        <div class="goal-card">
 
-<h1>🏆 Goal Collection</h1>
+            <h1>Collection Goals</h1>
 
-<p class="text-muted">
-Track your card collection goals.
-</p>
+            <p class="text-muted">
+                Track your card collection goals.
+            </p>
 
-</div>
+        </div>
 
-<a href="/add-goal" class="btn btn-success">
-+ Add Goal
-</a>
+        <a href="/add-goal" class="btn btn-success">
+            + Add Goal
+        </a>
 
-</div>
+    </div>
 
-<div class="row">
+    <div class="row">
 
-<% if(goals.length > 0){ %>
+        <% if(goals.length > 0){ %>
 
-<% goals.forEach(goal=>{ %>
+            <% goals.forEach(goal => { %>
 
-<div class="col-md-6 mb-4">
+                <div class="col-md-6 mb-4">
 
-<div class="card h-100 shadow">
+                    <div class="card h-100 shadow">
 
-<div class="card-body">
+                        <div class="card-body">
 
-<h3>
-<%= goal.goal_name %>
-</h3>
+                            <h3><%= goal.goal_name %></h3>
 
-<p>
-<%= goal.description %>
-</p>
+                            <p><%= goal.description %></p>
 
-<hr>
+                            <hr>
 
-<p>
+                            <p>
+                                <strong>Progress</strong>
+                                <br>
+                                <%= goal.current_cards %> /
+                                <%= goal.target_cards %> cards
+                            </p>
 
-<strong>Progress</strong>
+                            <span class="badge bg-primary mt-2">
+                                <%= goal.status %>
+                            </span>
 
-<br>
+                            <div class="mt-4 d-flex gap-2">
+                                <a href="/goal/<%= goal.goal_id %>"
+                                    class="btn btn-dark btn-sm">
+                                    View Goal
+                                </a>
+                                <a href="/edit-goal/<%= goal.goal_id %>"
+                                    class="btn btn-outline-primary btn-sm">
+                                    Edit
+                                </a>
+                                <a href="/remove-goal/<%= goal.goal_id %>"
+                                    class="btn btn-outline-danger btn-sm">
+                                    Delete
+                                </a>
+                            </div>
 
-<%= goal.current_cards %> /
+                        </div>
 
-<%= goal.target_cards %>
+                    </div>
 
-cards
+                </div>
 
-</p>
+            <% }) %>
 
-<span class="badge bg-primary">
-<%= goal.status %>
-</span>
+        <% } else { %>
 
-<div class="mt-4">
+            <div class="col-12">
 
-<a href="/goal/<%= goal.goal_id %>"
-class="btn btn-dark">
+                <div class="empty-message">
 
-View Goal
+                    No collection goals created yet.
 
-</a>
+                </div>
 
-</div>
+            </div>
 
-</div>
+        <% } %>
 
-</div>
-
-</div>
-
-<% }) %>
-
-<% } else { %>
-
-<div class="col-12">
-
-<div class="alert alert-warning">
-
-No goals created yet.
-
-</div>
-
-</div>
-
-<% } %>
-
-</div>
-
-</div>
+    </div>
 
 </div>
 
