@@ -22,6 +22,7 @@
 
 DROP TABLE IF EXISTS cards;
 DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS goals;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS rarities;
 DROP TABLE IF EXISTS users;
@@ -274,4 +275,127 @@ CREATE TABLE wishlist (
     date_added    DATE NOT NULL DEFAULT (CURRENT_DATE),
 
     FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
+);
+
+-- =============================================================================
+-- goals  -- owner: Rainie
+-- =============================================================================
+--
+-- Collection goals that users want to achieve.
+-- Users can create, edit, view and delete their own goals.
+-- Examples:
+--   • Complete Base Set 1999
+--   • Collect every Pikachu card
+--   • Own 50 graded cards
+--
+-- Design decisions:
+--
+--   user_id
+--     Each goal belongs to one user.
+--
+--   goal_name
+--     Short title of the collection goal.
+--
+--   description
+--     Optional notes describing the goal.
+--
+--   target_cards
+--     Number of cards the user wants to collect.
+--
+--   current_cards
+--     Current progress toward the goal.
+--
+--   status
+--     Automatically shown as In Progress or Completed.
+--
+--   ON DELETE CASCADE
+--     If a user account is deleted, all of their goals are removed.
+--
+-- =============================================================================
+
+DROP TABLE IF EXISTS goals;
+
+CREATE TABLE goals (
+
+    goal_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    user_id INT NOT NULL,
+
+    goal_name VARCHAR(100) NOT NULL,
+
+    description VARCHAR(255),
+
+    target_cards INT NOT NULL,
+
+    current_cards INT NOT NULL DEFAULT 0,
+
+    status ENUM('In Progress','Completed')
+        DEFAULT 'In Progress',
+
+    date_created DATE NOT NULL DEFAULT (CURRENT_DATE),
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE
+
+);
+
+-- =============================================================================
+-- Sample Goal Data
+-- =============================================================================
+
+INSERT INTO goals
+(
+    user_id,
+    goal_name,
+    description,
+    target_cards,
+    current_cards,
+    status
+)
+VALUES
+
+(
+    1,
+    'Complete Base Set 1999',
+    'Collect every card from the original Pokemon Base Set.',
+    102,
+    8,
+    'In Progress'
+),
+
+(
+    1,
+    'Complete Scarlet & Violet',
+    'Collect every Scarlet & Violet base set card.',
+    258,
+    75,
+    'In Progress'
+),
+
+(
+    1,
+    'Legendary Collection',
+    'Complete the Legendary Collection set.',
+    110,
+    110,
+    'Completed'
+),
+
+(
+    1,
+    'Collect Every Eeveelution',
+    'Own every Eeveelution card in mint condition.',
+    9,
+    6,
+    'In Progress'
+),
+
+(
+    1,
+    'Own 50 Graded Cards',
+    'Collect 50 PSA or BGS graded cards.',
+    50,
+    19,
+    'In Progress'
 );
