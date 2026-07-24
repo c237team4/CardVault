@@ -27,6 +27,8 @@ h4 { color: #f2ede1; }
 .badge.bg-danger { background: rgba(214,179,106,.18) !important; color: #e0c993; }
 .badge.bg-success { background: rgba(110,200,140,.16) !important; color: #a2d9b4; }
 .badge.bg-info { background: rgba(120,195,220,.16) !important; color: #a8d9e8; }
+.wishlist-img-wrap { height: 280px; width: 100%; overflow: hidden; background: #171c28; }
+.wishlist-img-wrap img { height: 100%; width: 100%; object-fit: cover; display: block; }
 /* ==== end overrides ==== */
 </style>
 
@@ -74,13 +76,17 @@ h4 { color: #f2ede1; }
 
                 <div class="card shadow-sm h-100 border-0 rounded-4 overflow-hidden">
 
-                    <!-- Placeholder image area (wishlist cards have no image on file yet) -->
-                    <div class="text-center p-4 bg-white d-flex align-items-center justify-content-center" style="height: 280px;">
-
-                        <span class="text-muted" style="font-size: 48px;">★</span>
-
+                    <!-- Card artwork (falls back to default.png if the file is missing or none was uploaded) -->
+                    <div class="wishlist-img-wrap">
+                        <img src="/images/<%= item.image || 'default.png' %>"
+                             alt="<%= item.card_name %>"
+                             onerror="this.onerror=null;this.src='/images/default.png';"
+                            style="
+                                height:280px;
+                                width:100%;
+                                object-fit:contain;">
                     </div>
-
+                    
                     <!-- Card Body -->
                     <div class="card-body">
 

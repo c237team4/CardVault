@@ -1175,20 +1175,28 @@ app.get('/add-wishlist', checkAuthenticated, (req, res) => {
 });
 
 // CREATE — handle the add submission
-app.post('/add-wishlist', checkAuthenticated, (req, res) => {
+app.post('/add-wishlist', checkAuthenticated, upload.single('image'), (req, res) => {
     const userId = req.session.user.user_id;
     const { card_name, category, target_price, notes } = req.body;
 
-    // card_name and category are required; target_price and notes are optional.
     if (!card_name || !category) {
         req.flash('error', 'Card name and category are required.');
         return res.redirect('/add-wishlist');
     }
 
-    const sql = `INSERT INTO wishlist (user_id, card_name, category, target_price, notes)
-                 VALUES (?, ?, ?, ?, ?)`;
+    let dbImageValue = 'default.png';
+    if (req.file) {
+        let folderName = category || 'Others';
+        if (folderName === 'Yu-Gi-Oh!') {
+            folderName = 'Yu-Gi-Oh';
+        }
+        dbImageValue = `${folderName}/${req.file.originalname}`;
+    }
+
+    const sql = `INSERT INTO wishlist (user_id, card_name, category, target_price, notes, image)
+                 VALUES (?, ?, ?, ?, ?, ?)`;
     connection.query(sql,
-        [userId, card_name, category, target_price || null, notes || null],
+        [userId, card_name, category, target_price || null, notes || null, dbImageValue],
         (err, result) => {
             if (err) {
                 console.error('Error adding to wishlist:', err);
@@ -1198,6 +1206,7 @@ app.post('/add-wishlist', checkAuthenticated, (req, res) => {
             res.redirect('/wishlist');
         });
 });
+
 
 // DELETE — show the confirmation page
 app.get('/remove-wishlist/:id', checkAuthenticated, (req, res) => {

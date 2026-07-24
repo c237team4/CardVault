@@ -270,6 +270,7 @@ CREATE TABLE wishlist (
     category      VARCHAR(50) NOT NULL,
     target_price  DECIMAL(10,2) DEFAULT NULL,
     notes         VARCHAR(255) DEFAULT NULL,
+    image         VARCHAR(255) DEFAULT 'default.png',
     date_added    DATE NOT NULL DEFAULT (CURRENT_DATE),
 
     FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
