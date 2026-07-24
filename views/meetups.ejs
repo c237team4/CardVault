@@ -110,12 +110,9 @@
 
 
 <!-- ============================================================
-     MEETUPS SCHEDULE  |  Owner: Tan Boon Meng (Student A) - Read
-     Any logged-in member can view upcoming meetups.
-     Layout: nearest upcoming = big featured card,
-             the next few = small cards.
-     Admin Add / Edit / Delete buttons come in later steps.
-     Renders with: user, meetups (already filtered to upcoming, soonest first)
+     Tan Boon Meng (25052694)
+     Members can view upcoming meetups.
+     Admin can Delete event schedules
      ============================================================ -->
 
 <div class="container my-5">
@@ -152,7 +149,11 @@
         <% } %>
         <% if (user && user.role === 'admin') { %>
           <div class="mt-4">
+
+
             <a href="/admin/edit-meetup/<%= next.meetup_id %>" class="btn btn-outline-primary btn-sm">Edit</a>
+
+
             <form action="/admin/delete-meetup/<%= next.meetup_id %>" method="POST" class="d-inline"
                   onsubmit="return confirm('Delete this meetup?');">
               <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
@@ -161,6 +162,7 @@
         <% } %>
       </div>
     </div>
+    
 
     <!-- The meetups after the nearest one (small cards) -->
     <% if (meetups.length > 1) { %>
@@ -196,7 +198,7 @@
   <% } else { %>
     <div class="text-center py-5">
       <h4>No upcoming meetups scheduled.</h4>
-      <p class="text-muted">Check back soon for the next community meetup.</p>
+      <p class="text-muted">Check back soon for the next members meetups.</p>
     </div>
   <% } %>
 
