@@ -1,0 +1,174 @@
+<%- include('partials/header', { title: 'Collection Goals', user: user }) %>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+    background:#0a0c12;
+    color:#d8dae0;
+}
+
+.container.my-5 h1{
+    font-family:'Instrument Serif',serif;
+    font-size:3.2rem;
+    color:#f4f2ee;
+}
+
+.container.my-5 p.text-muted{
+    color:#8b8f9a !important;
+}
+
+.goal-card{
+    background:linear-gradient(160deg,#12151d 0%,#0d1016 100%);
+    border:1px solid rgba(203,166,95,.28);
+    border-radius:14px;
+    box-shadow:0 18px 48px rgba(0,0,0,.55);
+}
+
+.goal-card h3{
+    font-family:'Instrument Serif',serif;
+    color:#f4f2ee;
+}
+
+.progress{
+    height:10px;
+    background:#1a1d25;
+}
+
+.progress-bar{
+    background:linear-gradient(180deg,#e0bf7c,#cba65f);
+}
+
+.btn-add{
+    background:linear-gradient(180deg,#e0bf7c,#cba65f);
+    color:#0a0c12;
+    border:none;
+    font-weight:600;
+}
+
+.btn-add:hover{
+    background:linear-gradient(180deg,#ecca88,#d9b46e);
+    color:#0a0c12;
+}
+
+.btn-edit{
+    color:#e0bf7c;
+    border:1px solid rgba(203,166,95,.5);
+    background:transparent;
+}
+
+.btn-edit:hover{
+    background:rgba(203,166,95,.14);
+    color:white;
+}
+
+.btn-delete{
+    color:#d98a86;
+    border:1px solid rgba(200,90,84,.45);
+    background:transparent;
+}
+
+.btn-delete:hover{
+    background:rgba(200,90,84,.15);
+    color:#f0b6b2;
+}
+
+.badge-status{
+    background:rgba(203,166,95,.15);
+    color:#e0bf7c;
+    border:1px solid rgba(203,166,95,.4);
+    padding:8px 14px;
+}
+</style>
+
+<div class="container my-5">
+
+    <div class="text-center mb-5">
+        <h1>Collection Goals</h1>
+        <p class="text-muted">
+            Track your Pokémon card collection progress and complete your dream sets.
+        </p>
+    </div>
+
+    <div class="text-center mb-5">
+        <a href="/add-goal" class="btn btn-add">
+            + Add Goal
+        </a>
+    </div>
+
+    <% if(goals.length===0){ %>
+
+        <div class="text-center py-5">
+            <h4>No collection goals yet.</h4>
+            <p class="text-muted">Create your first collection goal to start tracking your progress.</p>
+        </div>
+
+    <% } else { %>
+
+        <div class="row g-4">
+
+        <% goals.forEach(goal=>{ %>
+
+            <%
+                let percent = Math.round((goal.current_cards/goal.target_cards)*100);
+
+                if(percent>100){
+                    percent=100;
+                }
+            %>
+
+            <div class="col-md-6">
+
+                <div class="card goal-card h-100">
+
+                    <div class="card-body p-4">
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+
+                            <h3><%= goal.goal_name %></h3>
+
+                            <span class="badge badge-status">
+                                <%= goal.status %>
+                            </span>
+
+                        </div>
+
+                        <p class="text-muted">
+                            <%= goal.description %>
+                        </p>
+                        <p class="mb-3">
+                            <strong>Progress:</strong>
+                            <span style="color:#e0bf7c;">
+                                <%= goal.current_cards %> / <%= goal.target_cards %> cards
+                            </span>
+                        </p>
+
+                        <p class="text-muted mb-4">
+                            Created:
+                            <%= goal.date_created.toISOString().split('T')[0] %>
+                        </p>
+
+                        <a href="/edit-goal/<%= goal.goal_id %>" class="btn btn-edit">
+                            Edit
+                        </a>
+
+                        <a href="/remove-goal/<%= goal.goal_id %>" class="btn btn-delete">
+                            Delete
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        <% }) %>
+
+        </div>
+
+    <% } %>
+
+</div>
+
+<%- include('partials/footer') %>
