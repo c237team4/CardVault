@@ -152,7 +152,6 @@ const validateLogin = (req, res, next) => {
 
 // -----------------------------------------------------------------------------
 // SHARED  |  Owner: whole team
-// Landing page and logout. Agreed together, changed together.
 // -----------------------------------------------------------------------------
 
 app.get('/', (req, res) => {
@@ -165,13 +164,13 @@ app.get('/logout', (req, res) => {
 });
 
 
-// -----------------------------------------------------------------------------
-// STUDENT A  |  Owner: Tan Boon Meng (25052694)
-// User Registration, Login and Access Control
-// Routes: GET /register, POST /register, GET /login, POST /login
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------
+// Tan Boon Meng (25052694)
+// User Registration
+// Routes: GET /register, POST /register
+// --------------------------------------------------------------------------------------------------------------
 
-// Step 1 - GET /Register
+// GET /Register
 
 app.get('/register', (req, res) => {
     res.render('register', {
@@ -180,7 +179,7 @@ app.get('/register', (req, res) => {
     });
 });
 
-// Step 3 - POST /Register
+// POST /Register
 
 app.post('/register', validateRegistration, (req, res) => {
     const { username, email, password } = req.body;
@@ -201,7 +200,13 @@ app.post('/register', validateRegistration, (req, res) => {
     });
 });
 
-// Step 4a GET /login
+// -------------------------------------------------------------------------------------------------------------
+// Tan Boon Meng (25052694)
+// User Login
+// Routes: GET /login, POST /login, GET /forgot-password, POST /forgot-password
+// --------------------------------------------------------------------------------------------------------------
+
+// GET /login
 
 
 app.get('/login', (req, res) => {
@@ -211,7 +216,7 @@ app.get('/login', (req, res) => {
     });
 });
 
-// Step 4c POST /login
+// POST /login
 
 app.post('/login', validateLogin, (req, res) => {
     const { email, password } = req.body;
@@ -239,7 +244,13 @@ app.post('/login', validateLogin, (req, res) => {
     });
 });
 
-// Step 5 GET /forgot-password
+// -------------------------------------------------------------------------------------------------------------
+// Tan Boon Meng (25052694)
+// Password Reset
+// Routes: GET /forgot-password, POST /forgot-password
+// --------------------------------------------------------------------------------------------------------------
+
+// GET /forgot-password
 
 app.get('/forgot-password', (req, res) => {
     res.render('forgot-password', {
@@ -248,7 +259,7 @@ app.get('/forgot-password', (req, res) => {
 });
 
 
-// Step 6 POST /forgot-password
+// POST /forgot-password
 // Validation is handled by validateReset; this route just does the update.
 app.post('/forgot-password', validateReset, (req, res) => {
     const { email, password } = req.body;
@@ -272,13 +283,13 @@ app.post('/forgot-password', validateReset, (req, res) => {
 
 
 // -----------------------------------------------------------------------------
-// MEETUP: Member schedule page (Read)  --  Tan Boon Meng (Student A)
-// Any logged-in member can view upcoming meetups. The view shows the nearest
-// as a big featured card and the next few as small cards (views/meetups.ejs).
+// Tan Boon Meng (25052694)
+// Events Schedule
 // -----------------------------------------------------------------------------
+
+// GET /meetups
 app.get('/meetups', checkAuthenticated, (req, res) => {
-    // Upcoming meetups only, soonest first. CURDATE() is today's date in MySQL,
-    // so past events drop off automatically.
+  
     const sql = `
         SELECT meetup_id, title, location, description,
                DATE_FORMAT(meetup_date, '%W, %d %b %Y') AS date_display,
@@ -297,8 +308,7 @@ app.get('/meetups', checkAuthenticated, (req, res) => {
     });
 });
 
-// DELETE a meetup (admin only). POST, not a link, so it can't be
-// triggered accidentally or by a crawler following an <a href>.
+// POST /admin/delete-meetup/:id
 app.post('/admin/delete-meetup/:id', checkAuthenticated, checkAdmin, (req, res) => {
     const sql = 'DELETE FROM meetups WHERE meetup_id = ?';
     connection.query(sql, [req.params.id], (err, result) => {
