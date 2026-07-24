@@ -156,15 +156,13 @@ h4 { color: #f2ede1; }
                         </div>
 
                         <!-- Remove Button -->
-                        <div class="d-grid">
-
-                            <a href="/remove-wishlist/<%= item.wishlist_id %>"
-                               class="btn btn-outline-danger rounded-pill">
-                                Remove from Wishlist
-                            </a>
-
+                         <div class="d-grid">
+                            <form action="/remove-wishlist/<%= item.wishlist_id %>" method="POST"
+                                onsubmit="return confirm('Remove this card from wishlist?');">
+                                <button type="submit" class="btn btn-outline-danger rounded-pill w-100">Remove from Wishlist</button>
+                            </form>
                         </div>
-
+                        
                     </div>
 
                 </div>

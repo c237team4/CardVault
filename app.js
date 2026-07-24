@@ -454,6 +454,83 @@ app.get('/add-wishlist', checkAuthenticated, (req,res)=>{
 
 });
 
+app.post('/add-wishlist', checkAuthenticated, upload.single('image'), (req, res) => {
+
+    const userId = req.session.user.user_id;
+
+    const {
+        card_name,
+        category,
+        target_price,
+        notes
+    } = req.body;
+
+
+    const image = req.file ? req.file.filename : null;
+
+
+    const sql = `
+        INSERT INTO wishlist
+        (user_id, card_name, category, target_price, notes, image, date_added)
+        VALUES (?, ?, ?, ?, ?, ?, NOW())
+    `;
+
+
+    connection.query(
+        sql,
+        [
+            userId,
+            card_name,
+            category,
+            target_price || null,
+            notes || null,
+            image
+        ],
+        (err, result) => {
+
+            if (err) {
+                console.error("ADD WISHLIST DATABASE ERROR:", err);
+                return res.status(500).send(
+                    "Add wishlist database error: " + err.message
+                );
+            }
+
+
+            res.redirect('/wishlist');
+
+        }
+    );
+
+});
+
+app.post('/remove-wishlist/:id', checkAuthenticated, (req, res) => {
+
+    const wishlistId = req.params.id;
+    const userId = req.session.user.user_id;
+
+
+    const sql = `
+        DELETE FROM wishlist
+        WHERE wishlist_id = ?
+        AND user_id = ?
+    `;
+
+
+    connection.query(sql, [wishlistId, userId], (err, result) => {
+
+        if (err) {
+            console.error("REMOVE WISHLIST ERROR:", err);
+            return res.status(500).send(
+                "Remove wishlist error: " + err.message
+            );
+        }
+
+
+        res.redirect('/wishlist');
+
+    });
+
+});
 // -----------------------------------------------------------------------------
 // STUDENT C  |  Owner: Sammi
 // Viewing and Displaying Information
