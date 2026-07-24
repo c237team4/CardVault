@@ -750,6 +750,136 @@ app.post('/admin/delete-card/:id',
         });
 });
 
+// ==========================
+// GOAL COLLECTION
+// ==========================
+
+app.get('/goals', (req, res) => {
+
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    const user_id = req.session.user.user_id;
+
+    const sql = `
+        SELECT *
+        FROM goals
+        WHERE user_id = ?
+        ORDER BY date_created DESC
+    `;
+
+    connection.query(sql, [user_id], (err, results) => {
+
+        if (err) {
+            console.log(err);
+            return res.send("Database Error");
+        }
+
+        res.render('goals', {
+            goals: results,
+            user: req.session.user
+        });
+
+    });
+
+});
+
+app.get('/add-goal', (req, res) => {
+
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    res.render('add-goal', {
+        user: req.session.user
+    });
+
+});
+
+app.post('/add-goal', (req, res) => {
+
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    const user_id = req.session.user.user_id;
+
+    const {
+        goal_name,
+        description,
+        target_cards
+    } = req.body;
+
+    const sql = `
+        INSERT INTO goals
+        (
+            user_id,
+            goal_name,
+            description,
+            target_cards,
+            current_cards,
+            status
+        )
+        VALUES (?, ?, ?, ?, 0, 'In Progress')
+    `;
+
+    connection.query(
+        sql,
+        [
+            user_id,
+            goal_name,
+            description,
+            target_cards
+        ],
+        (err) => {
+
+            if (err) {
+                console.log(err);
+                return res.send("Unable to create goal.");
+            }
+
+            res.redirect('/goals');
+
+        }
+    );
+
+});
+
+app.get('/goal/:id', (req, res) => {
+
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    const goal_id = req.params.id;
+
+    const sql = `
+        SELECT *
+        FROM goals
+        WHERE goal_id = ?
+    `;
+
+    connection.query(sql, [goal_id], (err, results) => {
+
+        if (err) {
+            console.log(err);
+            return res.send("Database Error");
+        }
+
+        if (results.length === 0) {
+            return res.send("Goal not found");
+        }
+
+        res.render('view-goal', {
+            goal: results[0],
+            user: req.session.user
+        });
+
+    });
+
+});
+
 // -----------------------------------------------------------------------------
 // STUDENT F  |  Owner: Zhan Fung
 // Searching, Filtering and Organising -- over the user's OWN collection

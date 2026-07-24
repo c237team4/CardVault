@@ -1,0 +1,189 @@
+<%- include('partials/header', { title: goal.goal_name, user: user }) %>
+
+<style>
+    body {
+        background: #0a0c12;
+        color: #d8dae0;
+    }
+
+    .container.my-5 h1 {
+        font-family: 'Instrument Serif', Georgia, serif;
+        font-size: 3.25rem;
+        font-weight: 400;
+        color: #f4f2ee;
+    }
+
+    .container.my-5 .card {
+        background: linear-gradient(160deg, #12151d 0%, #0d1016 100%);
+        border: 1px solid rgba(203,166,95,.28);
+        border-radius: 14px;
+        box-shadow: 0 18px 48px rgba(0,0,0,.55);
+    }
+
+    .table {
+        color: #d8dae0;
+        margin-top: 2rem;
+    }
+
+    .table th {
+        color: lab(0.86% 0.12 0.47);
+        font-weight: 600;
+        border-color: rgba(203,166,95,.15);
+        background-color: #f5ecd5 !important;
+    }
+
+    .table td {
+        color: lab(1.6% 0.31 -4.06);
+        border-color: rgba(203,166,95,.15);
+        background-color: #fcf8ee !important;
+    }
+
+    .badge.bg-success {
+        background: rgba(230, 197, 136, 0.16) !important;
+        color: hsl(40, 53%, 66%) !important;
+        border: 1px solid rgba(203,166,95,.4);
+    }
+
+    .btn-dark {
+        background: transparent;
+        color: #e0bf7c;
+        border: 1px solid rgba(203,166,95,.45);
+        border-radius: 8px;
+    }
+
+    .btn-dark:hover {
+        background: rgba(203,166,95,.15);
+        color: #f4f2ee;
+        border-color: #cba65f;
+    }
+
+    .goal-subtitle {
+    color: #0d0a05;
+    font-size: 1rem;
+}
+</style>
+
+
+
+<div class="container my-5">
+
+<div class="card">
+
+<div class="card-body p-5">
+
+<h1 class="d-flex align-items-center gap-3 mb-3">
+    <span>🏆</span>
+    <span><%= goal.goal_name %></span>
+</h1>
+
+<p class="goal-subtitle mb-4">
+    View the details and progress of your collection goal.
+</p>
+
+<table class="table">
+
+<tr>
+
+<th width="200">
+
+Goal
+
+</th>
+
+<td>
+
+<%= goal.goal_name %>
+
+</td>
+
+</tr>
+
+<tr>
+
+<th>
+
+Description
+
+</th>
+
+<td>
+
+<%= goal.description %>
+
+</td>
+
+</tr>
+
+<tr>
+
+<th>
+
+Progress
+
+</th>
+
+<td>
+
+<%= goal.current_cards %>
+
+/
+
+<%= goal.target_cards %>
+
+cards
+
+</td>
+
+</tr>
+
+<tr>
+
+<th>
+
+Status
+
+</th>
+
+<td>
+
+<span class="badge bg-success">
+
+<%= goal.status %>
+
+</span>
+
+</td>
+
+</tr>
+
+<tr>
+
+<th>
+
+Date Created
+
+</th>
+
+<td>
+    <%= new Date(goal.date_created).toLocaleDateString('en-GB') %>
+</td>
+
+</tr>
+
+</table>
+
+<a href="/goals" class="btn btn-dark">
+
+← Back to Goal Collection
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<%- include('partials/footer') %>
