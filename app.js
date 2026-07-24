@@ -308,9 +308,7 @@ app.get('/meetups', checkAuthenticated, (req, res) => {
     });
 });
 
-<<<<<<< HEAD
 
-=======
 // POST /admin/delete-meetup/:id
 app.post('/admin/delete-meetup/:id', checkAuthenticated, checkAdmin, (req, res) => {
     const sql = 'DELETE FROM meetups WHERE meetup_id = ?';
@@ -323,7 +321,7 @@ app.post('/admin/delete-meetup/:id', checkAuthenticated, checkAdmin, (req, res) 
         res.redirect('/meetups');
     });
 });
->>>>>>> 3eff85aaabfa1b1292523d0fa06a4f86e9ab61b6
+
 
 // -----------------------------------------------------------------------------
 // STUDENT B  |  Owner: Ryan
