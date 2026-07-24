@@ -466,7 +466,17 @@ app.post('/add-wishlist', checkAuthenticated, upload.single('image'), (req, res)
     } = req.body;
 
 
-    const image = req.file ? req.file.filename : null;
+    let image = "default.png";
+    
+    if (req.file) {
+    let folderName = category || "Others";
+
+    if (folderName === "Yu-Gi-Oh!") {
+        folderName = "Yu-Gi-Oh";
+    }
+
+    image = `${folderName}/${req.file.filename}`;
+}
 
 
     const sql = `
