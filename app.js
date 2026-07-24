@@ -1482,11 +1482,38 @@ app.get('/admin/card/:id', checkAuthenticated, checkAdmin, (req, res) => {
 });
 
 // -----------------------------------------------------------------------------
-// STUDENT F  |  Owner: Zhan Fung
-// Add meetup functionality
+// MEETUP: Add schedule (Create)  --  Zhan Fung (Student F)
+// Admin posts a new community meetup. Members then see it on /meetups.
 // -----------------------------------------------------------------------------
 
+// Show the add-meetup form
+app.get('/admin/add-meetup', checkAuthenticated, checkAdmin, (req, res) => {
+    res.render('add-meetup', { messages: req.flash('error') });
+});
 
+// Handle the add-meetup submission
+app.post('/admin/add-meetup', checkAuthenticated, checkAdmin, (req, res) => {
+    const { title, location, meetup_date, start_time, end_time, description } = req.body;
+
+    // Title, location and date are required; times and description are optional.
+    if (!title || !location || !meetup_date) {
+        req.flash('error', 'Title, location and date are required.');
+        return res.redirect('/admin/add-meetup');
+    }
+
+    const sql = `INSERT INTO meetups (title, location, meetup_date, start_time, end_time, description)
+                 VALUES (?, ?, ?, ?, ?, ?)`;
+    connection.query(sql,
+        [title, location, meetup_date, start_time || null, end_time || null, description || null],
+        (err, result) => {
+            if (err) {
+                console.error('Error adding meetup:', err);
+                return res.status(500).send('Error adding meetup');
+            }
+            req.flash('success', 'Meetup added successfully!');
+            res.redirect('/meetups');
+        });
+});
 // -----------------------------------------------------------------------------
 
 // =============================================================================
