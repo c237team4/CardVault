@@ -88,7 +88,7 @@ h4 { color: #f2ede1; }
                     </div>
                     
                     <!-- Card Body -->
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column flex-grow-1">
 
                         <h2 class="text-center fw-bold mb-3">
 
@@ -99,8 +99,7 @@ h4 { color: #f2ede1; }
                         <hr>
 
                         <!-- Card Information -->
-                        <div class="mb-4">
-
+                        <div class="mb-4 flex-grow-1">
                             <!-- Category -->
                             <div class="mb-3">
 
@@ -155,12 +154,10 @@ h4 { color: #f2ede1; }
 
                         </div>
 
-                        <!-- Remove Button -->
-                         <div class="d-grid">
-                            <form action="/remove-wishlist/<%= item.wishlist_id %>" method="POST"
-                                onsubmit="return confirm('Remove this card from wishlist?');">
-                                <button type="submit" class="btn btn-outline-danger rounded-pill w-100">Remove from Wishlist</button>
-                            </form>
+                            <!-- Edit / Remove Buttons -->
+                        <div class="d-flex gap-2 mt-auto">
+                                <a href="/edit-wishlist/<%= item.wishlist_id %>" class="btn btn-outline-light rounded-pill w-50">Edit</a>
+                                <a href="/remove-wishlist/<%= item.wishlist_id %>" class="btn btn-outline-danger rounded-pill w-50">Remove</a>
                         </div>
                         
                     </div>

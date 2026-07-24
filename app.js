@@ -512,6 +512,114 @@ app.post('/add-wishlist', checkAuthenticated, upload.single('image'), (req, res)
     );
 
 });
+app.get('/edit-wishlist/:id', checkAuthenticated, (req, res) => {
+
+    const wishlistId = req.params.id;
+    const userId = req.session.user.user_id;
+
+    const sql = `
+        SELECT *
+        FROM wishlist
+        WHERE wishlist_id = ?
+        AND user_id = ?
+    `;
+
+    connection.query(sql, [wishlistId, userId], (err, results) => {
+        if (err) {
+            console.error("EDIT WISHLIST FETCH ERROR:", err);
+            return res.status(500).send("Edit wishlist error: " + err.message);
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send('Wishlist item not found');
+        }
+
+        res.render('edit-wishlist', {
+            item: results[0],
+            user: req.session.user,
+            messages: req.flash('error')
+        });
+    });
+
+});
+app.post('/edit-wishlist/:id', checkAuthenticated, upload.single('image'), (req, res) => {
+
+    const wishlistId = req.params.id;
+    const userId = req.session.user.user_id;
+
+    const {
+        card_name,
+        category,
+        target_price,
+        notes,
+        existing_image
+    } = req.body;
+
+    if (!card_name || !category) {
+        req.flash('error', 'Card name and category are required.');
+        return res.redirect('/edit-wishlist/' + wishlistId);
+    }
+
+    let image = existing_image || 'default.png';
+    if (req.file) {
+        let folderName = category || "Others";
+        if (folderName === "Yu-Gi-Oh!") {
+            folderName = "Yu-Gi-Oh";
+        }
+        image = `${folderName}/${req.file.filename}`;
+    }
+
+    const sql = `
+        UPDATE wishlist
+        SET card_name = ?, category = ?, target_price = ?, notes = ?, image = ?
+        WHERE wishlist_id = ?
+        AND user_id = ?
+    `;
+
+    connection.query(
+        sql,
+        [card_name, category, target_price || null, notes || null, image, wishlistId, userId],
+        (err, result) => {
+            if (err) {
+                console.error("EDIT WISHLIST UPDATE ERROR:", err);
+                return res.status(500).send("Edit wishlist error: " + err.message);
+            }
+            req.flash('success', 'Wishlist item updated!');
+            res.redirect('/wishlist');
+        }
+    );
+
+});
+
+app.get('/remove-wishlist/:id', checkAuthenticated, (req, res) => {
+
+    const wishlistId = req.params.id;
+    const userId = req.session.user.user_id;
+
+    const sql = `
+        SELECT *
+        FROM wishlist
+        WHERE wishlist_id = ?
+        AND user_id = ?
+    `;
+
+    connection.query(sql, [wishlistId, userId], (err, results) => {
+        if (err) {
+            console.error("REMOVE WISHLIST FETCH ERROR:", err);
+            return res.status(500).send("Remove wishlist error: " + err.message);
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send('Wishlist item not found');
+        }
+
+        res.render('remove-wishlist', {
+            item: results[0],
+            user: req.session.user
+        });
+    });
+
+});
 
 app.post('/remove-wishlist/:id', checkAuthenticated, (req, res) => {
 
@@ -541,6 +649,7 @@ app.post('/remove-wishlist/:id', checkAuthenticated, (req, res) => {
     });
 
 });
+
 // -----------------------------------------------------------------------------
 // STUDENT C  |  Owner: Sammi
 // Viewing and Displaying Information
