@@ -308,6 +308,7 @@ app.get('/meetups', checkAuthenticated, (req, res) => {
     });
 });
 
+
 // POST /admin/delete-meetup/:id
 app.post('/admin/delete-meetup/:id', checkAuthenticated, checkAdmin, (req, res) => {
     const sql = 'DELETE FROM meetups WHERE meetup_id = ?';
@@ -320,6 +321,7 @@ app.post('/admin/delete-meetup/:id', checkAuthenticated, checkAdmin, (req, res) 
         res.redirect('/meetups');
     });
 });
+
 
 // -----------------------------------------------------------------------------
 // STUDENT B  |  Owner: Ryan
@@ -406,62 +408,6 @@ app.post('/add-card', checkAuthenticated, upload.single('image'), (req, res) => 
 });
 
 // -----------------------------------------------------------------------------
-// MEETUP: Edit schedule (Update)  --  Ryan (Student B)
-// Admin edits an existing meetup. Members see the change on /meetups.
-// -----------------------------------------------------------------------------
-
-// Show the edit form, pre-filled with the meetup's current values
-app.get('/admin/edit-meetup/:id', checkAuthenticated, checkAdmin, (req, res) => {
-    // Format date/time to match what the <input type="date"> / <input type="time">
-    // fields expect: 'YYYY-MM-DD' and 'HH:MM'. Otherwise the boxes come up blank.
-    const sql = `
-        SELECT meetup_id, title, location,
-               DATE_FORMAT(meetup_date, '%Y-%m-%d') AS meetup_date,
-               TIME_FORMAT(start_time, '%H:%i')     AS start_time,
-               TIME_FORMAT(end_time, '%H:%i')       AS end_time,
-               description
-        FROM meetups
-        WHERE meetup_id = ?
-    `;
-    connection.query(sql, [req.params.id], (err, results) => {
-        if (err) {
-            console.error('Error loading meetup:', err);
-            return res.status(500).send('Database error');
-        }
-        if (results.length === 0) {
-            return res.status(404).send('Meetup not found');
-        }
-        res.render('edit-meetup', { meetup: results[0], messages: req.flash('error') });
-    });
-});
-
-// Handle the edit submission
-app.post('/admin/edit-meetup/:id', checkAuthenticated, checkAdmin, (req, res) => {
-    const { title, location, meetup_date, start_time, end_time, description } = req.body;
-
-    if (!title || !location || !meetup_date) {
-        req.flash('error', 'Title, location and date are required.');
-        return res.redirect('/admin/edit-meetup/' + req.params.id);
-    }
-
-    const sql = `
-        UPDATE meetups
-        SET title = ?, location = ?, meetup_date = ?, start_time = ?, end_time = ?, description = ?
-        WHERE meetup_id = ?
-    `;
-    connection.query(sql,
-        [title, location, meetup_date, start_time || null, end_time || null, description || null, req.params.id],
-        (err, result) => {
-            if (err) {
-                console.error('Error updating meetup:', err);
-                return res.status(500).send('Error updating meetup');
-            }
-            req.flash('success', 'Meetup updated successfully!');
-            res.redirect('/meetups');
-        });
-});
-
-// -----------------------------------------------------------------------------
 // STUDENT C  |  Owner: Sammi
 // Viewing and Displaying Information
 // -----------------------------------------------------------------------------
@@ -494,14 +440,12 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
         ORDER BY rarity
     `;
 
-
     connection.query(categorySql, [userId], (err, categories) => {
 
         if (err) {
             console.error(err);
             return res.status(500).send("Database error");
         }
-
 
         connection.query(raritySql, [userId], (err, rarities) => {
 
@@ -510,14 +454,12 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
                 return res.status(500).send("Database error");
             }
 
-
             connection.query(cardSql, [userId], (err, cards) => {
 
                 if (err) {
                     console.error(err);
                     return res.status(500).send("Database error");
                 }
-
 
                 res.render("dashboard", {
                     user: req.session.user,
@@ -536,7 +478,6 @@ app.get('/dashboard', checkAuthenticated, (req, res) => {
     });
 
 });
-
 
 // View one card
 app.get('/card/:id', checkAuthenticated, (req, res) => {
@@ -574,7 +515,156 @@ app.get('/card/:id', checkAuthenticated, (req, res) => {
 
 });
 
+
 // -----------------------------------------------------------------------------
+//Owner: Sammi
+// Collection Goals
+// -----------------------------------------------------------------------------
+
+
+// Display Edit Goal Page
+app.get('/edit-goal/:id', checkAuthenticated, (req, res) => {
+
+    const goalId = req.params.id;
+    const userId = req.session.user.user_id;
+
+    const sql = `
+        SELECT *
+        FROM goals
+        WHERE goal_id = ?
+        AND user_id = ?
+    `;
+
+    connection.query(sql, [goalId, userId], (err, results) => {
+
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Database error");
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send("Goal not found");
+        }
+
+        res.render("edit-goal", {
+            user: req.session.user,
+            goal: results[0]
+        });
+
+    });
+
+});
+
+app.post('/edit-goal/:id', checkAuthenticated, (req, res) => {
+
+    const goalId = req.params.id;
+    const userId = req.session.user.user_id;
+
+    const {
+        goal_name,
+        description,
+        target_cards,
+        current_cards,
+        status
+    } = req.body;
+
+    const sql = `
+        UPDATE goals
+        SET
+            goal_name = ?,
+            description = ?,
+            target_cards = ?,
+            current_cards = ?,
+            status = ?
+        WHERE goal_id = ?
+        AND user_id = ?
+    `;
+
+    connection.query(
+        sql,
+        [
+            goal_name,
+            description,
+            target_cards,
+            current_cards,
+            status,
+            goalId,
+            userId
+        ],
+        (err) => {
+
+            if (err) {
+                console.error(err);
+                return res.status(500).send("Database error");
+            }
+
+            res.redirect('/goals');
+        }
+    );
+
+});
+
+
+// Display Remove Goal Confirmation Page
+app.get('/remove-goal/:id', checkAuthenticated, (req, res) => {
+
+    const goalId = req.params.id;
+    const userId = req.session.user.user_id;
+
+    const sql = `
+        SELECT *
+        FROM goals
+        WHERE goal_id = ?
+        AND user_id = ?
+    `;
+
+    connection.query(sql, [goalId, userId], (err, results) => {
+
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Database error");
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send("Goal not found");
+        }
+
+        res.render("remove-goal", {
+            user: req.session.user,
+            goal: results[0]
+        });
+
+    });
+
+});
+
+// Delete Goal
+app.post('/remove-goal/:id', checkAuthenticated, (req, res) => {
+
+    const goalId = req.params.id;
+    const userId = req.session.user.user_id;
+
+    const sql = `
+        DELETE FROM goals
+        WHERE goal_id = ?
+        AND user_id = ?
+    `;
+
+    connection.query(sql, [goalId, userId], (err) => {
+
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Database error");
+        }
+
+        res.redirect('/goals');
+
+    });
+
+});
+
+
+// ----------------------------------------------------------------------------
 // STUDENT D  |  Owner: Ezann
 // Editing Existing Information + Reviews & Ratings
 // Routes: GET /edit-card/:id, POST /edit-card/:id
@@ -896,6 +986,136 @@ app.post('/admin/delete-card/:id',
         });
 });
 
+// ==========================
+// GOAL COLLECTION
+// ==========================
+
+app.get('/goals', (req, res) => {
+
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    const user_id = req.session.user.user_id;
+
+    const sql = `
+        SELECT *
+        FROM goals
+        WHERE user_id = ?
+        ORDER BY date_created DESC
+    `;
+
+    connection.query(sql, [user_id], (err, results) => {
+
+        if (err) {
+            console.log(err);
+            return res.send("Database Error");
+        }
+
+        res.render('goals', {
+            goals: results,
+            user: req.session.user
+        });
+
+    });
+
+});
+
+app.get('/add-goal', (req, res) => {
+
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    res.render('add-goal', {
+        user: req.session.user
+    });
+
+});
+
+app.post('/add-goal', (req, res) => {
+
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    const user_id = req.session.user.user_id;
+
+    const {
+        goal_name,
+        description,
+        target_cards
+    } = req.body;
+
+    const sql = `
+        INSERT INTO goals
+        (
+            user_id,
+            goal_name,
+            description,
+            target_cards,
+            current_cards,
+            status
+        )
+        VALUES (?, ?, ?, ?, 0, 'In Progress')
+    `;
+
+    connection.query(
+        sql,
+        [
+            user_id,
+            goal_name,
+            description,
+            target_cards
+        ],
+        (err) => {
+
+            if (err) {
+                console.log(err);
+                return res.send("Unable to create goal.");
+            }
+
+            res.redirect('/goals');
+
+        }
+    );
+
+});
+
+app.get('/goal/:id', (req, res) => {
+
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    const goal_id = req.params.id;
+
+    const sql = `
+        SELECT *
+        FROM goals
+        WHERE goal_id = ?
+    `;
+
+    connection.query(sql, [goal_id], (err, results) => {
+
+        if (err) {
+            console.log(err);
+            return res.send("Database Error");
+        }
+
+        if (results.length === 0) {
+            return res.send("Goal not found");
+        }
+
+        res.render('view-goal', {
+            goal: results[0],
+            user: req.session.user
+        });
+
+    });
+
+});
+
 // -----------------------------------------------------------------------------
 // STUDENT F  |  Owner: Zhan Fung
 // Searching, Filtering and Organising -- over the user's OWN collection
@@ -909,19 +1129,6 @@ app.get('/search', checkAuthenticated, (req, res) => {
     const category = req.query.category || "";
     const rarity = req.query.rarity || "";
 
-    const sql = `
-    SELECT cards.*,
-           conditions.condition_name
-    FROM cards
-    LEFT JOIN conditions
-    ON cards.condition_id = conditions.condition_id
-    WHERE cards.user_id = ?
-    AND cards.card_name LIKE ?
-    AND cards.category LIKE ?
-    AND cards.rarity LIKE ?
-    ORDER BY date_added DESC
-    `;
-
     const categorySql = `
         SELECT DISTINCT category
         FROM cards
@@ -929,12 +1136,24 @@ app.get('/search', checkAuthenticated, (req, res) => {
         ORDER BY category
     `;
 
-
     const raritySql = `
         SELECT DISTINCT rarity
         FROM cards
         WHERE user_id = ?
         ORDER BY rarity
+    `;
+
+    const sql = `
+        SELECT cards.*,
+               conditions.condition_name
+        FROM cards
+        LEFT JOIN conditions
+        ON cards.condition_id = conditions.condition_id
+        WHERE cards.user_id = ?
+        AND cards.card_name LIKE ?
+        AND cards.category LIKE ?
+        AND cards.rarity LIKE ?
+        ORDER BY date_added DESC
     `;
 
     connection.query(categorySql, [userId], (err, categories) => {
@@ -944,14 +1163,12 @@ app.get('/search', checkAuthenticated, (req, res) => {
             return res.status(500).send("Database error");
         }
 
-
         connection.query(raritySql, [userId], (err, rarities) => {
 
             if (err) {
                 console.error(err);
                 return res.status(500).send("Database error");
             }
-
 
             connection.query(
                 sql,
@@ -968,19 +1185,14 @@ app.get('/search', checkAuthenticated, (req, res) => {
                         return res.status(500).send("Database error");
                     }
 
-
                     res.render("dashboard", {
-
                         user: req.session.user,
                         cards: cards,
-
                         categories: categories,
                         rarities: rarities,
-
                         search: search,
                         categoryFilter: category,
                         rarityFilter: rarity
-
                     });
 
                 }
@@ -991,7 +1203,6 @@ app.get('/search', checkAuthenticated, (req, res) => {
     });
 
 });
-
 
 // -----------------------------------------------------------------------------
 // Admin Dashboard
@@ -1267,132 +1478,7 @@ app.get('/admin/card/:id', checkAuthenticated, checkAdmin, (req, res) => {
 
 
 });
-
 // -----------------------------------------------------------------------------
-// MEETUP: Add schedule (Create)  --  Zhan Fung (Student F)
-// Admin posts a new community meetup. Members then see it on /meetups.
-// -----------------------------------------------------------------------------
-
-// Show the add-meetup form
-app.get('/admin/add-meetup', checkAuthenticated, checkAdmin, (req, res) => {
-    res.render('add-meetup', { messages: req.flash('error') });
-});
-
-// Handle the add-meetup submission
-app.post('/admin/add-meetup', checkAuthenticated, checkAdmin, (req, res) => {
-    const { title, location, meetup_date, start_time, end_time, description } = req.body;
-
-    // Title, location and date are required; times and description are optional.
-    if (!title || !location || !meetup_date) {
-        req.flash('error', 'Title, location and date are required.');
-        return res.redirect('/admin/add-meetup');
-    }
-
-    const sql = `INSERT INTO meetups (title, location, meetup_date, start_time, end_time, description)
-                 VALUES (?, ?, ?, ?, ?, ?)`;
-    connection.query(sql,
-        [title, location, meetup_date, start_time || null, end_time || null, description || null],
-        (err, result) => {
-            if (err) {
-                console.error('Error adding meetup:', err);
-                return res.status(500).send('Error adding meetup');
-            }
-            req.flash('success', 'Meetup added successfully!');
-            res.redirect('/meetups');
-        });
-});
-
-// -----------------------------------------------------------------------------
-
-// =============================================================================
-// WISHLIST  --  private per-user "grail cards" a member is hunting for.
-// Owner: wishlist team.  Each user sees ONLY their own wishlist.
-// =============================================================================
-
-// READ — show the logged-in user's wishlist
-app.get('/wishlist', checkAuthenticated, (req, res) => {
-    const userId = req.session.user.user_id;
-    const sql = 'SELECT * FROM wishlist WHERE user_id = ? ORDER BY date_added DESC';
-    connection.query(sql, [userId], (err, results) => {
-        if (err) {
-            console.error('Error loading wishlist:', err);
-            return res.status(500).send('Database error');
-        }
-        res.render('wishlist', {
-            user: req.session.user,
-            wishlist: results,
-        });
-    });
-});
-
-// CREATE — show the add form
-app.get('/add-wishlist', checkAuthenticated, (req, res) => {
-    res.render('add-wishlist', { user: req.session.user, messages: req.flash('error') });
-});
-
-// CREATE — handle the add submission
-app.post('/add-wishlist', checkAuthenticated, upload.single('image'), (req, res) => {
-    const userId = req.session.user.user_id;
-    const { card_name, category, target_price, notes } = req.body;
-
-    if (!card_name || !category) {
-        req.flash('error', 'Card name and category are required.');
-        return res.redirect('/add-wishlist');
-    }
-
-    let dbImageValue = 'default.png';
-    if (req.file) {
-        let folderName = category || 'Others';
-        if (folderName === 'Yu-Gi-Oh!') {
-            folderName = 'Yu-Gi-Oh';
-        }
-        dbImageValue = `${folderName}/${req.file.originalname}`;
-    }
-
-    const sql = `INSERT INTO wishlist (user_id, card_name, category, target_price, notes, image)
-                 VALUES (?, ?, ?, ?, ?, ?)`;
-    connection.query(sql,
-        [userId, card_name, category, target_price || null, notes || null, dbImageValue],
-        (err, result) => {
-            if (err) {
-                console.error('Error adding to wishlist:', err);
-                return res.status(500).send('Error adding to wishlist');
-            }
-            req.flash('success', 'Card added to your wishlist!');
-            res.redirect('/wishlist');
-        });
-});
-
-
-// DELETE — show the confirmation page
-app.get('/remove-wishlist/:id', checkAuthenticated, (req, res) => {
-    const userId = req.session.user.user_id;
-    const sql = 'SELECT * FROM wishlist WHERE wishlist_id = ? AND user_id = ?';
-    connection.query(sql, [req.params.id, userId], (err, results) => {
-        if (err) {
-            console.error('Error loading wishlist item:', err);
-            return res.status(500).send('Database error');
-        }
-        if (results.length === 0) {
-            return res.redirect('/wishlist');   // not theirs, or doesn't exist
-        }
-        res.render('remove-wishlist', { user: req.session.user, item: results[0] });
-    });
-});
-
-// DELETE — handle the removal
-app.post('/remove-wishlist/:id', checkAuthenticated, (req, res) => {
-    const userId = req.session.user.user_id;
-    const sql = 'DELETE FROM wishlist WHERE wishlist_id = ? AND user_id = ?';
-    connection.query(sql, [req.params.id, userId], (err, result) => {
-        if (err) {
-            console.error('Error removing from wishlist:', err);
-            return res.status(500).send('Error removing from wishlist');
-        }
-        req.flash('success', 'Card removed from your wishlist.');
-        res.redirect('/wishlist');
-    });
-});
 
 // =============================================================================
 

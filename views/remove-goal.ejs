@@ -1,0 +1,92 @@
+<%- include('partials/header', { title: 'Remove Collection Goal', user: user }) %>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+    background:#0a0c12;
+    color:#d8dae0;
+}
+
+.goal-card{
+    background:linear-gradient(160deg,#12151d 0%,#0d1016 100%);
+    border:1px solid rgba(200,90,84,.35);
+    border-radius:14px;
+    box-shadow:0 18px 48px rgba(0,0,0,.55);
+}
+
+h1{
+    font-family:'Instrument Serif',serif;
+    font-size:3rem;
+    color:#f4f2ee;
+}
+
+h3{
+    color:#f4f2ee;
+}
+
+.text-warning{
+    color:#e0bf7c !important;
+}
+
+.btn-delete{
+    background:#c85a54;
+    border:none;
+    color:white;
+    font-weight:600;
+}
+
+.btn-delete:hover{
+    background:#b84b45;
+}
+
+.btn-cancel{
+    color:#e0bf7c;
+    border:1px solid rgba(203,166,95,.5);
+}
+
+.btn-cancel:hover{
+    background:rgba(203,166,95,.15);
+    color:white;
+}
+</style>
+
+<div class="container my-5" style="max-width:700px;">
+
+<div class="goal-card p-5">
+
+<h1 class="mb-4">Remove Collection Goal</h1>
+
+<h3><%= goal.goal_name %></h3>
+
+<p class="text-muted">
+<%= goal.description %>
+</p>
+
+<p>
+<strong class="text-warning">Progress:</strong>
+<%= goal.current_cards %> / <%= goal.target_cards %> cards
+</p>
+
+<p class="text-danger mt-4 mb-4">
+Are you sure you want to permanently delete this collection goal?
+</p>
+
+<form action="/remove-goal/<%= goal.goal_id %>" method="POST">
+
+<button class="btn btn-delete">
+Delete Goal
+</button>
+
+<a href="/goals" class="btn btn-cancel ms-2">
+Cancel
+</a>
+
+</form>
+
+</div>
+
+</div>
+
+<%- include('partials/footer') %>
