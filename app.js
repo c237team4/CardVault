@@ -203,7 +203,7 @@ app.post('/register', validateRegistration, (req, res) => {
 // -------------------------------------------------------------------------------------------------------------
 // Tan Boon Meng (25052694)
 // User Login
-// Routes: GET /login, POST /login, GET /forgot-password, POST /forgot-password
+// Routes: GET /login, POST /login
 // --------------------------------------------------------------------------------------------------------------
 
 // GET /login
@@ -285,6 +285,7 @@ app.post('/forgot-password', validateReset, (req, res) => {
 // -----------------------------------------------------------------------------
 // Tan Boon Meng (25052694)
 // Events Schedule
+// Routes: GET /meetups, POST /admin/delete-meetup/:id
 // -----------------------------------------------------------------------------
 
 // GET /meetups
@@ -324,9 +325,9 @@ app.post('/admin/delete-meetup/:id', checkAuthenticated, checkAdmin, (req, res) 
 
 
 // -----------------------------------------------------------------------------
-// STUDENT B  |  Owner: Ryan
-// Adding New Information -- add a card to your collection
-// Routes: GET /add-card, POST /add-card   (POST uses upload.single('image'))
+// Ryan (25052448)
+// Adding New card to collection
+// Routes: GET /add-card, POST /add-card  
 // -----------------------------------------------------------------------------
 // Display Add Card Page
 app.get('/add-card', checkAuthenticated, (req, res) => {
@@ -542,8 +543,8 @@ app.post('/remove-wishlist/:id', checkAuthenticated, (req, res) => {
 
 });
 // -----------------------------------------------------------------------------
-// STUDENT C  |  Owner: Sammi
-// Viewing and Displaying Information
+// Sammi (24029891)
+// Viewing and Displaying cards collection
 // -----------------------------------------------------------------------------
 // View logged-in user's collection
 app.get('/dashboard', checkAuthenticated, (req, res) => {
@@ -651,7 +652,7 @@ app.get('/card/:id', checkAuthenticated, (req, res) => {
 
 
 // -----------------------------------------------------------------------------
-//Owner: Sammi
+//Owner: Sammi (24029891)
 // Collection Goals
 // -----------------------------------------------------------------------------
 
@@ -799,7 +800,7 @@ app.post('/remove-goal/:id', checkAuthenticated, (req, res) => {
 
 
 // ----------------------------------------------------------------------------
-// STUDENT D  |  Owner: Ezann
+// Ezann (25013180)
 // Editing Existing Information + Reviews & Ratings
 // Routes: GET /edit-card/:id, POST /edit-card/:id
 //         GET /meetup-reviews, GET /meetup/:id, POST /meetup/:id/reviews,
@@ -1070,7 +1071,7 @@ app.post('/delete-review/:id', checkAuthenticated, (req, res) => {
 });
 
 // -----------------------------------------------------------------------------
-// STUDENT E  |  Owner: Rainie
+// Rainie (25023092)
 // Removing Information + admin moderation
 // Routes: POST /delete-card/:id
 // -----------------------------------------------------------------------------
@@ -1251,8 +1252,8 @@ app.get('/goal/:id', (req, res) => {
 });
 
 // -----------------------------------------------------------------------------
-// STUDENT F  |  Owner: Zhan Fung
-// Searching, Filtering and Organising -- over the user's OWN collection
+// Zhan Fung (25046126)
+// Searching, Filtering and Organising collection
 //
 // -----------------------------------------------------------------------------
 app.get('/search', checkAuthenticated, (req, res) => {
@@ -1339,9 +1340,7 @@ app.get('/search', checkAuthenticated, (req, res) => {
 });
 
 // -----------------------------------------------------------------------------
-// STUDENT F  |  Owner: Zhan Fung
 // Admin Dashboard
-//
 // -----------------------------------------------------------------------------
 app.get('/admin-dashboard', checkAuthenticated, checkAdmin, (req, res) => {
 
@@ -1616,7 +1615,7 @@ app.get('/admin/card/:id', checkAuthenticated, checkAdmin, (req, res) => {
 });
 
 // -----------------------------------------------------------------------------
-// MEETUP: Add schedule (Create)  --  Zhan Fung (Student F)
+// MEETUP: Add schedule
 // Admin posts a new community meetup. Members then see it on /meetups.
 // -----------------------------------------------------------------------------
 
@@ -1651,8 +1650,9 @@ app.post('/admin/add-meetup', checkAuthenticated, checkAdmin, (req, res) => {
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-// MEETUP: Edit schedule (Update)  --  Ryan (Student B)
-// (Restored — these routes were dropped during a merge conflict.)
+// Ryan (25052448)
+// MEETUP: Edit event schedule
+//
 // -----------------------------------------------------------------------------
 app.get('/admin/edit-meetup/:id', checkAuthenticated, checkAdmin, (req, res) => {
     // Format date/time to match what the <input type="date"> / <input type="time">
