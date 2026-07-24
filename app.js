@@ -407,6 +407,53 @@ app.post('/add-card', checkAuthenticated, upload.single('image'), (req, res) => 
     });
 });
 
+
+// ==========================
+// WISHLIST
+// ==========================
+app.get('/wishlist', checkAuthenticated, (req, res) => {
+
+    const userId = req.session.user.user_id;
+
+
+    const sql = `
+        SELECT *
+        FROM wishlist
+        WHERE user_id = ?
+        ORDER BY date_added DESC
+    `;
+
+
+    connection.query(sql, [userId], (err, wishlist) => {
+
+        if (err) {
+
+            console.error("WISHLIST DATABASE ERROR:", err);
+
+            return res.status(500).send(
+                "Wishlist database error: " + err.message
+            );
+
+        }
+
+
+        res.render('wishlist', {
+            user: req.session.user,
+            wishlist: wishlist
+        });
+
+    });
+
+});
+
+app.get('/add-wishlist', checkAuthenticated, (req,res)=>{
+
+    res.render('add-wishlist',{
+        user:req.session.user
+    });
+
+});
+
 // -----------------------------------------------------------------------------
 // STUDENT C  |  Owner: Sammi
 // Viewing and Displaying Information
